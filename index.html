@@ -1,0 +1,2902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forex Journal Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap');
+
+        :root {
+            --bg: #091018;
+            --panel: rgba(10, 18, 30, 0.94);
+            --line: rgba(148, 163, 184, 0.18);
+            --text: #e5eef8;
+            --muted: #8ea2b8;
+            --accent: #f59e0b;
+            --green: #22c55e;
+            --red: #fb7185;
+            --cyan: #38bdf8;
+            --amber: #f59e0b;
+            --surface: #151f2f;
+            --surface-2: #202b3d;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Manrope', sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 28%),
+                radial-gradient(circle at top right, rgba(245, 158, 11, 0.12), transparent 24%),
+                linear-gradient(180deg, #071018 0%, #0b1320 45%, #091018 100%);
+            min-height: 100vh;
+        }
+
+        .shell {
+            max-width: 1640px;
+            margin: 0 auto;
+        }
+
+        .nav-wrap,
+        .card,
+        .hero-panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            backdrop-filter: blur(18px);
+        }
+
+        .nav-btn {
+            color: var(--muted);
+            transition: 180ms ease;
+        }
+
+        .nav-btn.active {
+            background: rgba(245, 158, 11, 0.12);
+            color: #fff7ed;
+            box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.25);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            color: var(--text) !important;
+            background: #071018 !important;
+            border: 1px solid rgba(148, 163, 184, 0.18) !important;
+            border-radius: 8px;
+            padding: 10px 12px;
+            outline: none;
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: rgba(56, 189, 248, 0.7) !important;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
+        }
+
+        .table-header {
+            background: rgba(148, 163, 184, 0.08);
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            background: rgba(148, 163, 184, 0.05);
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .section-kicker {
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .glow-btn,
+        .calendar-btn,
+        .action-btn {
+            transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+        }
+
+        .glow-btn {
+            background: linear-gradient(135deg, #f59e0b, #fb7185);
+            color: #08111b;
+            box-shadow: 0 18px 30px rgba(245, 158, 11, 0.16);
+        }
+
+        .ghost-btn,
+        .action-btn,
+        .calendar-btn {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            border: 1px solid rgba(148, 163, 184, 0.16);
+        }
+
+        .glow-btn:hover,
+        .ghost-btn:hover,
+        .action-btn:hover,
+        .calendar-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .mini-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .mini-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+        }
+
+        .mini-row:last-child {
+            padding-bottom: 0;
+            border-bottom: 0;
+        }
+
+        .modal-surface {
+            background: linear-gradient(180deg, rgba(13, 23, 35, 0.98), rgba(8, 17, 27, 0.98));
+            border: 1px solid rgba(245, 158, 11, 0.22);
+            border-radius: 8px;
+        }
+
+        .upload-box {
+            border: 1px dashed rgba(148, 163, 184, 0.28);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 12px;
+        }
+
+        .upload-preview,
+        .detail-image {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+            border-radius: 8px;
+            background: rgba(148, 163, 184, 0.08);
+            border: 1px solid rgba(148, 163, 184, 0.12);
+        }
+
+        .upload-preview {
+            border-radius: 6px;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .chip-green {
+            background: rgba(34, 197, 94, 0.12);
+            color: #bbf7d0;
+            border: 1px solid rgba(34, 197, 94, 0.18);
+        }
+
+        .chip-red {
+            background: rgba(251, 113, 133, 0.12);
+            color: #fecdd3;
+            border: 1px solid rgba(251, 113, 133, 0.18);
+        }
+
+        .metric-block {
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .storage-pill {
+            border: 1px solid rgba(56, 189, 248, 0.18);
+            background: rgba(56, 189, 248, 0.08);
+            color: #bfdbfe;
+        }
+
+        .mistake-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .mistake-chip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            background: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            user-select: none;
+            transition: 180ms ease;
+        }
+
+        .mistake-chip.active {
+            border-color: rgba(245, 158, 11, 0.32);
+            background: rgba(245, 158, 11, 0.08);
+            color: #fff7ed;
+        }
+
+        .mistake-chip input {
+            width: 16px;
+            height: 16px;
+            margin: 0;
+            pointer-events: none;
+        }
+
+        .stack-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .stack-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            background: rgba(255, 255, 255, 0.04);
+            color: #d8e4f2;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .zoomable-image {
+            cursor: zoom-in;
+        }
+
+        .zoom-stage {
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            border-radius: 10px;
+        }
+
+        .zoom-stage img {
+            max-width: 100%;
+            max-height: 78vh;
+            transform-origin: center center;
+            transition: transform 160ms ease;
+        }
+
+        .calendar-shell {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 340px;
+            gap: 22px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 1px;
+            background: rgba(148, 163, 184, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .calendar-head {
+            background: transparent;
+            color: #9cb2cc;
+            text-align: center;
+            font-size: 12px;
+            padding: 10px 0 14px;
+            text-transform: none;
+        }
+
+        .calendar-cell {
+            min-height: 102px;
+            background: #1b2434;
+            padding: 12px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid transparent;
+        }
+
+        .calendar-cell.muted {
+            color: rgba(148, 163, 184, 0.42);
+        }
+
+        .calendar-cell.today {
+            box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.4);
+        }
+
+        .calendar-cell.positive {
+            background: linear-gradient(180deg, rgba(10, 74, 57, 0.95), rgba(19, 66, 58, 0.95));
+            border-color: rgba(16, 185, 129, 0.34);
+        }
+
+        .calendar-cell.negative {
+            background: linear-gradient(180deg, rgba(79, 22, 38, 0.95), rgba(69, 26, 37, 0.95));
+            border-color: rgba(251, 113, 133, 0.34);
+        }
+
+        .calendar-cell.reset-day {
+            box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.42);
+        }
+
+        .calendar-cell .day-no {
+            font-size: 16px;
+            color: #d6e2f0;
+        }
+
+        .calendar-cell .day-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            text-align: right;
+            font-size: 12px;
+        }
+
+        .calendar-side {
+            display: grid;
+            gap: 14px;
+        }
+
+        .calendar-week {
+            border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+            padding-bottom: 14px;
+        }
+
+        .calendar-week:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .calendar-week-title {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .calendar-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .picker-day-label {
+            text-align: center;
+            color: #9cb2cc;
+            font-size: 13px;
+            padding-bottom: 6px;
+        }
+
+        .picker-day {
+            aspect-ratio: 1 / 1;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #dce6f3;
+            font-size: 15px;
+        }
+
+        .picker-day.muted {
+            color: rgba(148, 163, 184, 0.45);
+        }
+
+        .picker-day.selected {
+            background: rgba(245, 158, 11, 0.18);
+            border-color: rgba(245, 158, 11, 0.42);
+            color: #fff7ed;
+        }
+
+        .picker-day.today {
+            box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.42);
+        }
+
+        .hidden-input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            width: 1px;
+            height: 1px;
+        }
+
+        @media (max-width: 1200px) {
+            .calendar-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .calendar-side {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .action-stack {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .mistake-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-wrap {
+                width: 100%;
+                overflow-x: auto;
+            }
+
+            .calendar-side {
+                grid-template-columns: 1fr;
+            }
+
+            .calendar-cell {
+                min-height: 88px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body class="p-4 lg:p-8">
+    <div class="shell space-y-6">
+        <section class="hero-panel p-6 lg:p-8">
+            <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                <div class="max-w-3xl space-y-4">
+                    <span class="pill">Forex Journal Command Center</span>
+                    <div class="space-y-3">
+                        <h1 class="text-4xl lg:text-6xl font-extrabold leading-none text-white">Build skill with structure, not guesswork.</h1>
+                        <p class="text-slate-300 max-w-2xl text-sm lg:text-base">
+                            Your journal now runs as a local-first trading vault with daily PNL mapping, reset checkpoints, screenshot review, and editable process rules.
+                        </p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 w-full max-w-xl">
+                    <div class="card p-4">
+                        <p class="text-[11px] uppercase tracking-[0.08em] text-slate-400 font-bold">Capital Engine</p>
+                        <p class="mt-2 text-2xl font-extrabold" id="heroBalance">$10,000</p>
+                    </div>
+                    <div class="card p-4">
+                        <p class="text-[11px] uppercase tracking-[0.08em] text-slate-400 font-bold">Execution Edge</p>
+                        <p class="mt-2 text-2xl font-extrabold" id="heroExpectancy">0.00R</p>
+                    </div>
+                    <div class="card p-4">
+                        <p class="text-[11px] uppercase tracking-[0.08em] text-slate-400 font-bold">Max Drawdown</p>
+                        <p class="mt-2 text-2xl font-extrabold text-rose-300" id="heroDrawdown">0.00%</p>
+                    </div>
+                    <div class="card p-4">
+                        <p class="text-[11px] uppercase tracking-[0.08em] text-slate-400 font-bold">Local Vault</p>
+                        <p class="mt-2 text-sm font-extrabold" id="storageStatus">Loading local database...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div class="nav-wrap flex gap-1 p-1">
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn active px-5 py-2 rounded-md font-bold text-sm whitespace-nowrap">Dashboard</button>
+                <button onclick="switchTab('tradelog')" id="btn-tradelog" class="nav-btn px-5 py-2 rounded-md font-bold text-sm whitespace-nowrap">Trade Log</button>
+            </div>
+            <div class="flex gap-3 action-stack">
+                <button onclick="connectBackupFile()" class="action-btn px-4 py-3 rounded-md font-extrabold text-sm whitespace-nowrap">Connect Local Backup</button>
+                <button onclick="downloadVaultBackup()" class="ghost-btn px-4 py-3 rounded-md font-extrabold text-sm whitespace-nowrap">Backup Snapshot</button>
+                <button onclick="triggerBackupImport()" class="ghost-btn px-4 py-3 rounded-md font-extrabold text-sm whitespace-nowrap">Import Backup</button>
+                <button onclick="exportJournal('json')" class="ghost-btn px-4 py-3 rounded-md font-extrabold text-sm whitespace-nowrap">Export JSON</button>
+                <button onclick="exportJournal('csv')" class="ghost-btn px-4 py-3 rounded-md font-extrabold text-sm whitespace-nowrap">Export CSV</button>
+                <button onclick="openResetBalanceModal()" class="action-btn px-4 py-3 rounded-md font-extrabold text-sm whitespace-nowrap">Reset Balance</button>
+                <button onclick="openModal()" class="glow-btn px-6 py-3 rounded-md font-extrabold text-sm whitespace-nowrap">Add New Entry</button>
+            </div>
+        </div>
+
+        <input type="file" id="backupImportInput" class="hidden-input" accept=".json,application/json" onchange="handleBackupImport(event)">
+
+        <div id="dashboard" class="tab-content active space-y-6">
+            <section class="grid grid-cols-2 xl:grid-cols-8 gap-4">
+                <div class="card p-5">
+                    <p class="text-xs text-slate-400 font-bold uppercase">Current Balance</p>
+                    <h2 id="statBal" class="text-2xl font-extrabold mt-2">$10,000.00</h2>
+                </div>
+                <div class="card p-5">
+                    <p class="text-xs text-slate-400 font-bold uppercase">Net Gain</p>
+                    <h2 id="statGain" class="text-2xl font-extrabold mt-2 text-emerald-400">0.00%</h2>
+                </div>
+                <div class="card p-5">
+                    <p class="text-xs text-slate-400 font-bold uppercase">Win Rate</p>
+                    <h2 id="statWR" class="text-2xl font-extrabold mt-2">0%</h2>
+                </div>
+                <div class="card p-5">
+                    <p class="text-xs text-slate-400 font-bold uppercase">Expectancy</p>
+                    <h2 id="statExpectancy" class="text-2xl font-extrabold mt-2">0.00R</h2>
+                </div>
+                <div class="card p-5">
+                    <p class="text-xs text-slate-400 font-bold uppercase">Profit Factor</p>
+                    <h2 id="statProfitFactor" class="text-2xl font-extrabold mt-2">0.00</h2>
+                </div>
+                <div class="card p-5">
+                    <p class="text-xs text-slate-400 font-bold uppercase">Plan Compliance</p>
+                    <h2 id="statPlanRate" class="text-2xl font-extrabold mt-2">0%</h2>
+                </div>
+                <div class="card p-5">
+                    <p class="text-xs text-slate-400 font-bold uppercase">Max Drawdown</p>
+                    <h2 id="statDrawdown" class="text-2xl font-extrabold mt-2 text-rose-300">0.00%</h2>
+                </div>
+                <div class="card p-5">
+                    <p class="text-xs text-slate-400 font-bold uppercase">Losing Month Streak</p>
+                    <h2 id="statLosingMonths" class="text-2xl font-extrabold mt-2">0</h2>
+                </div>
+            </section>
+
+            <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div class="card p-6 xl:col-span-2">
+                    <div class="flex items-center justify-between gap-4 mb-4">
+                        <div>
+                            <p class="section-kicker">Capital Growth</p>
+                            <h3 class="font-extrabold text-xl">Equity Curve</h3>
+                        </div>
+                        <p class="text-xs text-slate-400">Reset checkpoints create a new balance baseline without erasing history.</p>
+                    </div>
+                    <div class="h-[360px]"><canvas id="equityChart"></canvas></div>
+                </div>
+
+                <div class="card p-6">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <p class="section-kicker">Operating Rules</p>
+                            <h3 class="font-extrabold text-xl mt-1">Daily Process</h3>
+                        </div>
+                        <button onclick="openRulesEditor()" class="ghost-btn w-10 h-10 rounded-md flex items-center justify-center" aria-label="Edit operating rules">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                    </div>
+                    <div id="operatingRulesList" class="mini-list mt-5 text-sm text-slate-300"></div>
+                </div>
+            </section>
+
+            <section class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div class="card p-6">
+                    <p class="section-kicker">Edge Snapshot</p>
+                    <h3 class="font-extrabold text-xl mt-1">What is working</h3>
+                    <div class="mini-list mt-5 text-sm text-slate-300">
+                        <div class="mini-row"><span>Best pair</span><strong id="bestPair" class="text-white">None</strong></div>
+                        <div class="mini-row"><span>Best session</span><strong id="bestSession" class="text-white">None</strong></div>
+                        <div class="mini-row"><span>Best execution time</span><strong id="bestExecutionTime" class="text-white">None</strong></div>
+                        <div class="mini-row"><span>A-grade trade share</span><strong id="bestGradeRate" class="text-white">0%</strong></div>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <p class="section-kicker">Risk Control</p>
+                    <h3 class="font-extrabold text-xl mt-1">Protection layer</h3>
+                    <div class="mini-list mt-5 text-sm text-slate-300">
+                        <div class="mini-row"><span>Average risk per trade</span><strong id="avgRisk" class="text-white">0%</strong></div>
+                        <div class="mini-row"><span>Largest single win</span><strong id="largestWin" class="text-emerald-300">0.00%</strong></div>
+                        <div class="mini-row"><span>Largest single loss</span><strong id="largestLoss" class="text-rose-300">0.00%</strong></div>
+                        <div class="mini-row"><span>Max losing streak</span><strong id="statStreak" class="text-white">0</strong></div>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <p class="section-kicker">Monthly Pressure</p>
+                    <h3 class="font-extrabold text-xl mt-1">Trade less signal</h3>
+                    <div class="mini-list mt-5 text-sm text-slate-300">
+                        <div class="mini-row"><span>Longest losing-month streak</span><strong id="longestMonthStreak" class="text-white">0</strong></div>
+                        <div class="mini-row"><span>Current losing-month streak</span><strong id="currentMonthStreak" class="text-white">0</strong></div>
+                        <div class="mini-row"><span>Worst month</span><strong id="worstMonth" class="text-rose-300">None</strong></div>
+                        <div class="mini-row"><span>Warning</span><strong id="monthWarning" class="text-amber-300">No warning</strong></div>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <p class="section-kicker">Improvement Focus</p>
+                    <h3 class="font-extrabold text-xl mt-1">Next thing to fix</h3>
+                    <div class="mt-5 space-y-4">
+                        <div class="metric-block">
+                            <p class="text-xs uppercase tracking-[0.08em] text-slate-400 font-bold">Most common mistake</p>
+                            <p id="topMistake" class="text-xl font-extrabold mt-2">None logged</p>
+                        </div>
+                        <div class="metric-block">
+                            <p class="text-xs uppercase tracking-[0.08em] text-slate-400 font-bold">Coaching note</p>
+                            <p id="coachingNote" class="text-sm text-slate-300 mt-2">Add a few trades and this journal will show where your execution is leaking money.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div class="card p-6">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <p class="section-kicker">Checklist Library</p>
+                            <h3 class="font-extrabold text-xl mt-1">Trade Confluence</h3>
+                        </div>
+                        <button onclick="openChecklistEditor()" class="ghost-btn w-10 h-10 rounded-md flex items-center justify-center" aria-label="Edit checklist library">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                    </div>
+                    <div id="checklistLibraryList" class="stack-list mt-5"></div>
+                </div>
+
+                <div class="card p-6">
+                    <p class="section-kicker">Confluence Edge</p>
+                    <h3 class="font-extrabold text-xl mt-1">High Probability Stack</h3>
+                    <div class="mini-list mt-5 text-sm text-slate-300">
+                        <div class="mini-row"><span>Best single checklist</span><strong id="bestChecklistItem" class="text-white">None</strong></div>
+                        <div class="mini-row"><span>Best checklist combo</span><strong id="bestChecklistCombo" class="text-white">None</strong></div>
+                        <div class="mini-row"><span>Average confluences per trade</span><strong id="avgChecklistCount" class="text-white">0.0</strong></div>
+                        <div class="mini-row"><span>Best execution window</span><strong id="bestExecutionWindow" class="text-white">None</strong></div>
+                    </div>
+                    <div id="checklistComboLeaders" class="space-y-3 mt-5"></div>
+                </div>
+
+                <div class="card p-6">
+                    <div class="flex items-center justify-between gap-4 mb-4">
+                        <div>
+                            <p class="section-kicker">Timing Edge</p>
+                            <h3 class="font-extrabold text-xl">Performance by Execution Time</h3>
+                        </div>
+                    </div>
+                    <div class="h-[320px]"><canvas id="executionChart"></canvas></div>
+                </div>
+            </section>
+
+            <section class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div class="card p-6">
+                    <div class="flex items-center justify-between gap-4 mb-4">
+                        <div>
+                            <p class="section-kicker">Session Study</p>
+                            <h3 class="font-extrabold text-xl">Performance by Session</h3>
+                        </div>
+                    </div>
+                    <div class="h-[320px]"><canvas id="sessionChart"></canvas></div>
+                </div>
+                <div class="card p-6">
+                    <div class="flex items-center justify-between gap-4 mb-4">
+                        <div>
+                            <p class="section-kicker">Instrument Study</p>
+                            <h3 class="font-extrabold text-xl">Performance by Pair</h3>
+                        </div>
+                    </div>
+                    <div class="h-[320px]"><canvas id="pairChart"></canvas></div>
+                </div>
+                <div class="card p-6">
+                    <div class="flex items-center justify-between gap-4 mb-4">
+                        <div>
+                            <p class="section-kicker">Playbook</p>
+                            <h3 class="font-extrabold text-xl">Setup Distribution</h3>
+                        </div>
+                    </div>
+                    <div class="h-[320px]"><canvas id="setupChart"></canvas></div>
+                </div>
+                <div class="card p-6">
+                    <div class="flex items-center justify-between gap-4 mb-4">
+                        <div>
+                            <p class="section-kicker">Review</p>
+                            <h3 class="font-extrabold text-xl">Mistake Analysis</h3>
+                        </div>
+                    </div>
+                    <div class="h-[320px]"><canvas id="mistakeChart"></canvas></div>
+                </div>
+                <div class="card p-6 xl:col-span-2">
+                    <div class="flex items-center justify-between gap-4 mb-4">
+                        <div>
+                            <p class="section-kicker">Month-by-Month</p>
+                            <h3 class="font-extrabold text-xl">Monthly Gain and Drawdown Watch</h3>
+                        </div>
+                        <p class="text-xs text-slate-400">Red months are where you may want to cut size or frequency</p>
+                    </div>
+                    <div class="h-[320px]"><canvas id="monthlyChart"></canvas></div>
+                </div>
+            </section>
+
+            <section class="card p-6">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-6">
+                    <div>
+                        <p class="section-kicker">Daily Summary</p>
+                        <h3 class="font-extrabold text-2xl mt-1" id="dailySummaryMonthLabel">Month</h3>
+                    </div>
+                    <div class="flex flex-wrap gap-3 items-center">
+                        <button onclick="shiftDailySummaryMonth(-1)" class="ghost-btn w-12 h-12 rounded-md flex items-center justify-center"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button onclick="jumpDailySummaryToToday()" class="ghost-btn px-4 py-3 rounded-md font-extrabold text-sm">Today</button>
+                        <button onclick="shiftDailySummaryMonth(1)" class="ghost-btn w-12 h-12 rounded-md flex items-center justify-center"><i class="fa-solid fa-chevron-right"></i></button>
+                        <div class="pill storage-pill"><span>PnL:</span><strong id="dailySummaryPnl">$0.00</strong></div>
+                        <div class="pill storage-pill"><span>Days:</span><strong id="dailySummaryDays">0</strong></div>
+                    </div>
+                </div>
+
+                <div class="calendar-shell">
+                    <div>
+                        <div class="grid grid-cols-7 gap-1 mb-2">
+                            <div class="calendar-head">Sun</div>
+                            <div class="calendar-head">Mon</div>
+                            <div class="calendar-head">Tue</div>
+                            <div class="calendar-head">Wed</div>
+                            <div class="calendar-head">Thu</div>
+                            <div class="calendar-head">Fri</div>
+                            <div class="calendar-head">Sat</div>
+                        </div>
+                        <div id="dailySummaryGrid" class="calendar-grid"></div>
+                    </div>
+                    <div class="calendar-side">
+                        <div class="card p-5">
+                            <p class="text-xs uppercase tracking-[0.08em] text-slate-400 font-bold mb-4">Weekly Summary</p>
+                            <div id="weeklySummaryList" class="space-y-4"></div>
+                        </div>
+                        <div class="card p-5">
+                            <p class="text-xs uppercase tracking-[0.08em] text-slate-400 font-bold mb-4">Reset Checkpoints</p>
+                            <div id="resetCheckpointList" class="space-y-3 text-sm text-slate-300"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div id="tradelog" class="tab-content card overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="p-4">Date</th>
+                            <th class="p-4">Time (NY)</th>
+                            <th class="p-4">Pair</th>
+                            <th class="p-4">Bias</th>
+                            <th class="p-4">Session</th>
+                            <th class="p-4">Setup</th>
+                            <th class="p-4">Grade</th>
+                            <th class="p-4">Risk</th>
+                            <th class="p-4">Plan</th>
+                            <th class="p-4">Result</th>
+                            <th class="p-4">R</th>
+                            <th class="p-4">Gain %</th>
+                            <th class="p-4">Screens</th>
+                            <th class="p-4">Mistakes</th>
+                            <th class="p-4 text-right">Balance</th>
+                            <th class="p-4 text-right">View</th>
+                            <th class="p-4 text-right">Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logTableBody" class="divide-y divide-white/5"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="modal-surface w-full max-w-6xl max-h-[92vh] overflow-y-auto p-6 lg:p-8">
+            <div class="flex items-center justify-between gap-4 mb-6">
+                <div>
+                    <p class="section-kicker">New Journal Entry</p>
+                    <h2 class="text-2xl lg:text-3xl font-extrabold">Log a trade with intent and review.</h2>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-2xl"></i>
+                </button>
+            </div>
+
+            <form onsubmit="submitTrade(event)" class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div class="space-y-4">
+                    <p class="text-xs font-bold text-amber-300 uppercase tracking-[0.08em]">Context</p>
+                    <button type="button" onclick="openDatePicker('trade')" id="mDateButton" class="calendar-btn flex items-center justify-between px-4 py-3 rounded-md font-bold">
+                        <span id="mDateDisplay">Select trade date</span>
+                        <i class="fa-regular fa-calendar"></i>
+                    </button>
+                    <input type="hidden" id="mDateValue">
+                    <input type="time" id="mExecutionTime" required onchange="syncSessionFromExecutionTime()">
+                    <input type="text" id="mPair" placeholder="Pair (EURUSD / XAUUSD)" required class="uppercase">
+                    <div class="metric-block">
+                        <p class="text-xs uppercase tracking-[0.08em] text-slate-400 font-bold">Auto Session (New York UTC-4)</p>
+                        <p id="mSessionDisplay" class="text-lg font-extrabold mt-2">New York</p>
+                    </div>
+                    <select id="mType">
+                        <option>Buy</option>
+                        <option>Sell</option>
+                    </select>
+                    <select id="mBias">
+                        <option>Bullish</option>
+                        <option>Bearish</option>
+                        <option>Range</option>
+                        <option>Neutral</option>
+                    </select>
+                </div>
+
+                <div class="space-y-4">
+                    <p class="text-xs font-bold text-cyan-300 uppercase tracking-[0.08em]">Trade Plan</p>
+                    <input type="text" id="mSetup" placeholder="Setup Name" required>
+                    <select id="mEntryModel">
+                        <option>Pullback</option>
+                        <option>Breakout</option>
+                        <option>Liquidity Sweep</option>
+                        <option>Reversal</option>
+                        <option>Continuation</option>
+                    </select>
+                    <input type="text" id="mTimeframe" placeholder="Execution timeframe (e.g. 5M)">
+                    <div>
+                        <div class="flex items-center justify-between gap-3 mb-3">
+                            <p class="text-xs font-bold text-cyan-300 uppercase tracking-[0.08em]">Checklist Confluence</p>
+                            <button type="button" onclick="openChecklistEditor()" class="ghost-btn px-3 py-2 rounded-md font-bold text-[11px]">Edit List</button>
+                        </div>
+                        <div id="checklistSelector" class="mistake-grid"></div>
+                    </div>
+                    <select id="mGrade">
+                        <option>A+</option>
+                        <option>A</option>
+                        <option>B+</option>
+                        <option>B</option>
+                        <option>C</option>
+                    </select>
+                </div>
+
+                <div class="space-y-4">
+                    <p class="text-xs font-bold text-emerald-300 uppercase tracking-[0.08em]">Risk Engine</p>
+                    <input type="number" step="0.1" id="mRiskPct" placeholder="Risk % per trade" required value="1">
+                    <input type="number" step="0.1" id="mSL" placeholder="Stop loss (pips)" required oninput="calcR()">
+                    <input type="number" step="0.1" id="mTP" placeholder="Take profit (pips)" required oninput="calcR()">
+                    <select id="mResult" onchange="calcR()">
+                        <option value="Win">Win</option>
+                        <option value="Loss">Loss</option>
+                        <option value="BE">BE</option>
+                    </select>
+                    <select id="mPlan">
+                        <option value="Yes">Followed Plan: Yes</option>
+                        <option value="No">Followed Plan: No</option>
+                    </select>
+                    <div class="rounded-md bg-emerald-500/10 p-3 text-center border border-emerald-400/15">
+                        <span class="text-[10px] block uppercase tracking-[0.08em] text-slate-400">Final R-Multiple</span>
+                        <span id="displayR" class="text-2xl font-extrabold text-emerald-300">0.00</span>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <p class="text-xs font-bold text-rose-300 uppercase tracking-[0.08em]">Review</p>
+                    <div id="mistakeSelector" class="mistake-grid"></div>
+                    <textarea id="mExplainTrade" placeholder="Explain the trade / Why did you enter"></textarea>
+                    <textarea id="mExplainMistakes" placeholder="Explain mistakes"></textarea>
+                </div>
+
+                <div class="lg:col-span-4 space-y-4">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <p class="section-kicker">Screenshots</p>
+                            <h3 class="font-extrabold text-lg">Before, between, and after the trade</h3>
+                        </div>
+                        <p class="text-xs text-slate-400">Images are compressed before storage so the journal stays responsive.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="upload-box space-y-3">
+                            <p class="text-xs font-bold uppercase tracking-[0.08em] text-slate-400">Before Trade</p>
+                            <img id="previewBefore" class="upload-preview" alt="Before trade preview">
+                            <input type="file" id="mScreenshotBefore" accept="image/*" onchange="handlePreview(this, 'previewBefore')">
+                        </div>
+                        <div class="upload-box space-y-3">
+                            <p class="text-xs font-bold uppercase tracking-[0.08em] text-slate-400">Between Trade</p>
+                            <img id="previewDuring" class="upload-preview" alt="Between trade preview">
+                            <input type="file" id="mScreenshotDuring" accept="image/*" onchange="handlePreview(this, 'previewDuring')">
+                        </div>
+                        <div class="upload-box space-y-3">
+                            <p class="text-xs font-bold uppercase tracking-[0.08em] text-slate-400">After Trade</p>
+                            <img id="previewAfter" class="upload-preview" alt="After trade preview">
+                            <input type="file" id="mScreenshotAfter" accept="image/*" onchange="handlePreview(this, 'previewAfter')">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-4 pt-4 border-t border-white/10">
+                    <button type="submit" class="glow-btn w-full py-4 rounded-md font-extrabold text-sm">Commit Journal Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="tradeDetailModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="modal-surface w-full max-w-6xl max-h-[92vh] overflow-y-auto p-6 lg:p-8">
+            <div class="flex items-center justify-between gap-4 mb-6">
+                <div>
+                    <p class="section-kicker">Trade Review</p>
+                    <h2 id="detailTitle" class="text-2xl lg:text-3xl font-extrabold">Trade Detail</h2>
+                </div>
+                <button onclick="closeTradeDetail()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-2xl"></i>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+                <div class="metric-block">
+                    <p class="text-xs uppercase tracking-[0.08em] text-slate-400 font-bold">Gain</p>
+                    <p id="detailGain" class="text-xl font-extrabold mt-2">0.00%</p>
+                </div>
+                <div class="metric-block">
+                    <p class="text-xs uppercase tracking-[0.08em] text-slate-400 font-bold">Balance After</p>
+                    <p id="detailBalance" class="text-xl font-extrabold mt-2">$0.00</p>
+                </div>
+                <div class="metric-block">
+                    <p class="text-xs uppercase tracking-[0.08em] text-slate-400 font-bold">Execution Time (NY)</p>
+                    <p id="detailExecutionTime" class="text-xl font-extrabold mt-2">00:00</p>
+                </div>
+                <div class="metric-block">
+                    <p class="text-xs uppercase tracking-[0.08em] text-slate-400 font-bold">Plan</p>
+                    <p id="detailPlan" class="text-xl font-extrabold mt-2">Yes</p>
+                </div>
+                <div class="metric-block">
+                    <p class="text-xs uppercase tracking-[0.08em] text-slate-400 font-bold">Mistakes</p>
+                    <p id="detailMistakes" class="text-sm font-extrabold mt-2">None</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                <div class="space-y-3">
+                    <p class="text-xs font-bold uppercase tracking-[0.08em] text-slate-400">Before Trade</p>
+                    <img id="detailBefore" class="detail-image zoomable-image" alt="Before trade image" onclick="openImageZoom(this.src, 'Before Trade')">
+                </div>
+                <div class="space-y-3">
+                    <p class="text-xs font-bold uppercase tracking-[0.08em] text-slate-400">Between Trade</p>
+                    <img id="detailDuring" class="detail-image zoomable-image" alt="Between trade image" onclick="openImageZoom(this.src, 'Between Trade')">
+                </div>
+                <div class="space-y-3">
+                    <p class="text-xs font-bold uppercase tracking-[0.08em] text-slate-400">After Trade</p>
+                    <img id="detailAfter" class="detail-image zoomable-image" alt="After trade image" onclick="openImageZoom(this.src, 'After Trade')">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="metric-block">
+                    <p class="text-xs uppercase tracking-[0.08em] text-slate-400 font-bold">Checklist Confluence</p>
+                    <p id="detailChecklist" class="text-sm text-slate-300 mt-2">None selected.</p>
+                </div>
+                <div class="metric-block">
+                    <p class="text-xs uppercase tracking-[0.08em] text-slate-400 font-bold">Explain the Trade / Why Did You Enter</p>
+                    <p id="detailExplainTrade" class="text-sm text-slate-300 mt-2">No explanation recorded.</p>
+                </div>
+                <div class="metric-block">
+                    <p class="text-xs uppercase tracking-[0.08em] text-slate-400 font-bold">Explain Mistakes</p>
+                    <p id="detailExplainMistakes" class="text-sm text-slate-300 mt-2">No mistakes recorded.</p>
+                </div>
+            </div>
+            <div class="pt-6">
+                <button onclick="deleteTradeFromDetail()" class="ghost-btn px-4 py-3 rounded-md font-extrabold text-sm">Delete This Trade</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="checklistEditorModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="modal-surface w-full max-w-2xl p-6">
+            <div class="flex items-center justify-between gap-4 mb-6">
+                <div>
+                    <p class="section-kicker">Checklist Library</p>
+                    <h3 class="text-2xl font-extrabold">Edit Confluence List</h3>
+                </div>
+                <button onclick="closeChecklistEditor()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            </div>
+            <textarea id="checklistEditorInput" class="min-h-[220px]" placeholder="One checklist item per line"></textarea>
+            <div class="flex justify-end gap-3 pt-5">
+                <button onclick="closeChecklistEditor()" class="ghost-btn px-4 py-3 rounded-md font-extrabold text-sm">Cancel</button>
+                <button onclick="saveChecklistEditor()" class="glow-btn px-4 py-3 rounded-md font-extrabold text-sm">Save Checklist</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageZoomModal" class="fixed inset-0 bg-black/95 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="modal-surface w-full max-w-6xl p-6">
+            <div class="flex items-center justify-between gap-4 mb-4">
+                <div>
+                    <p class="section-kicker">Image Review</p>
+                    <h3 id="zoomImageTitle" class="text-2xl font-extrabold">Trade Screenshot</h3>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="adjustZoom(-0.25)" class="ghost-btn w-11 h-11 rounded-md flex items-center justify-center"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                    <button onclick="resetZoom()" class="ghost-btn px-4 py-3 rounded-md font-extrabold text-sm">Reset</button>
+                    <button onclick="adjustZoom(0.25)" class="ghost-btn w-11 h-11 rounded-md flex items-center justify-center"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                    <button onclick="closeImageZoom()" class="ghost-btn w-11 h-11 rounded-md flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <div class="zoom-stage">
+                <img id="zoomImage" alt="Zoomed trade screenshot">
+            </div>
+        </div>
+    </div>
+
+    <div id="datePickerModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="modal-surface w-full max-w-md p-6">
+            <div class="flex items-center justify-between mb-5">
+                <button onclick="shiftPickerMonth(-1)" class="ghost-btn w-10 h-10 rounded-full flex items-center justify-center"><i class="fa-solid fa-chevron-left"></i></button>
+                <div class="text-center">
+                    <p class="text-xs uppercase tracking-[0.08em] text-slate-400 font-bold">Select Date</p>
+                    <h3 id="pickerMonthLabel" class="text-2xl font-extrabold mt-1">Month</h3>
+                </div>
+                <button onclick="shiftPickerMonth(1)" class="ghost-btn w-10 h-10 rounded-full flex items-center justify-center"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            <div class="calendar-picker-grid mb-4">
+                <div class="picker-day-label">Su</div>
+                <div class="picker-day-label">Mo</div>
+                <div class="picker-day-label">Tu</div>
+                <div class="picker-day-label">We</div>
+                <div class="picker-day-label">Th</div>
+                <div class="picker-day-label">Fr</div>
+                <div class="picker-day-label">Sa</div>
+            </div>
+            <div id="pickerGrid" class="calendar-picker-grid mb-5"></div>
+            <div class="flex items-center justify-between gap-3 pt-4 border-t border-white/10">
+                <button onclick="setPickerToday()" class="glow-btn px-4 py-3 rounded-md font-extrabold text-sm">Today</button>
+                <button onclick="clearPickerDate()" class="ghost-btn px-4 py-3 rounded-md font-extrabold text-sm">Clear</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="rulesEditorModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="modal-surface w-full max-w-2xl p-6">
+            <div class="flex items-center justify-between gap-4 mb-6">
+                <div>
+                    <p class="section-kicker">Operating Rules</p>
+                    <h3 class="text-2xl font-extrabold">Edit Daily Process</h3>
+                </div>
+                <button onclick="closeRulesEditor()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            </div>
+            <textarea id="rulesEditorInput" class="min-h-[220px]" placeholder="One rule per line"></textarea>
+            <div class="flex justify-end gap-3 pt-5">
+                <button onclick="closeRulesEditor()" class="ghost-btn px-4 py-3 rounded-md font-extrabold text-sm">Cancel</button>
+                <button onclick="saveRulesEditor()" class="glow-btn px-4 py-3 rounded-md font-extrabold text-sm">Save Rules</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="resetBalanceModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="modal-surface w-full max-w-xl p-6">
+            <div class="flex items-center justify-between gap-4 mb-6">
+                <div>
+                    <p class="section-kicker">Balance Checkpoint</p>
+                    <h3 class="text-2xl font-extrabold">Reset Balance Without Deleting History</h3>
+                </div>
+                <button onclick="closeResetBalanceModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            </div>
+            <div class="space-y-4">
+                <button type="button" onclick="openDatePicker('reset')" id="resetDateButton" class="calendar-btn flex items-center justify-between px-4 py-3 rounded-md font-bold">
+                    <span id="resetDateDisplay">Select reset date</span>
+                    <i class="fa-regular fa-calendar"></i>
+                </button>
+                <input type="hidden" id="resetDateValue">
+                <input type="time" id="resetTimeValue">
+                <input type="number" step="0.01" id="resetBalanceValue" placeholder="New starting balance">
+                <textarea id="resetNoteValue" placeholder="Optional note about the reset"></textarea>
+            </div>
+            <div class="flex justify-end gap-3 pt-5">
+                <button onclick="closeResetBalanceModal()" class="ghost-btn px-4 py-3 rounded-md font-extrabold text-sm">Cancel</button>
+                <button onclick="saveBalanceReset()" class="glow-btn px-4 py-3 rounded-md font-extrabold text-sm">Save Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DB_NAME = 'forexJournalVault';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'kv';
+        const STATE_KEY = 'journal-state';
+        const START_BALANCE = 10000;
+        const LEGACY_KEYS = ['eliteTradesV4', 'eliteTradesV3', 'eliteTrades'];
+        const IMAGE_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 400'%3E%3Crect width='640' height='400' fill='%230c1523'/%3E%3Cpath d='M130 275l85-95 70 70 55-45 110 110H130z' fill='%2323374d'/%3E%3Ccircle cx='472' cy='138' r='36' fill='%2338bdf8' fill-opacity='.35'/%3E%3Ctext x='50%25' y='52%25' fill='%2393a8be' font-family='Manrope, sans-serif' font-size='24' text-anchor='middle'%3ENo screenshot%3C/text%3E%3C/svg%3E";
+        const DEFAULT_RULES = [
+            'Trade only when bias, invalidation, and risk are clear.',
+            'Use screenshots to review structure before, during, and after execution.',
+            'Respect drawdown and negative months by reducing frequency.',
+            'Back up your journal often and study it outside the chart.'
+        ];
+        const DEFAULT_CHECKLIST_LIBRARY = [
+            'HTF BOS',
+            'LTF BOS',
+            'MTF BOS',
+            'CHOCH',
+            '5 MIN IND',
+            'D POI',
+            '15 REJ'
+        ];
+        const MISTAKE_OPTIONS = [
+            'Early entry',
+            'Late entry',
+            'Early exit',
+            'Ignored bias',
+            'Oversized trade',
+            'Low quality setup',
+            'Revenge trading',
+            'Overtrading',
+            'Holding position too long'
+        ];
+
+        let db = null;
+        let state = null;
+        let chartRefs = {};
+        let latestAnalytics = null;
+        let activeDetailTradeId = null;
+        let dailySummaryMonthCursor = null;
+        let backupFileHandle = null;
+        let isReady = false;
+        let imageZoomLevel = 1;
+        let datePickerState = {
+            context: 'trade',
+            selectedDate: '',
+            viewYear: 0,
+            viewMonth: 0
+        };
+
+        function defaultState() {
+            return {
+                version: 6,
+                trades: [],
+                balanceResets: [],
+                rules: [...DEFAULT_RULES],
+                checklistLibrary: [...DEFAULT_CHECKLIST_LIBRARY],
+                lastSavedAt: '',
+                backupInfo: {
+                    connected: false,
+                    lastBackupAt: ''
+                }
+            };
+        }
+
+        function formatCurrency(value, decimals = 2) {
+            return `$${Number(value).toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`;
+        }
+
+        function safeParse(value) {
+            try {
+                return value ? JSON.parse(value) : null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function getNewYorkNow() {
+            const formatter = new Intl.DateTimeFormat('en-CA', {
+                timeZone: 'America/New_York',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+
+            const parts = formatter.formatToParts(new Date());
+            const map = {};
+            parts.forEach(part => {
+                if (part.type !== 'literal') map[part.type] = part.value;
+            });
+
+            return {
+                date: `${map.year}-${map.month}-${map.day}`,
+                time: `${map.hour}:${map.minute}`,
+                year: Number(map.year),
+                month: Number(map.month) - 1,
+                day: Number(map.day)
+            };
+        }
+
+        function inferSessionFromTime(timeValue) {
+            if (!timeValue) return 'London';
+            const [hourText] = timeValue.split(':');
+            const hour = Number(hourText);
+            if (Number.isNaN(hour)) return 'London';
+            if (hour >= 19 || hour < 2) return 'Asia';
+            if (hour >= 2 && hour < 8) return 'London';
+            if (hour >= 8 && hour < 17) return 'New York';
+            return 'Off Session';
+        }
+
+        function stampDate() {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const hh = String(now.getHours()).padStart(2, '0');
+            const mi = String(now.getMinutes()).padStart(2, '0');
+            return `${yyyy}${mm}${dd}-${hh}${mi}`;
+        }
+
+        function normalizeTrade(trade) {
+            const screenshots = trade.screenshots || {};
+            const mistakes = Array.isArray(trade.mistakes)
+                ? trade.mistakes
+                : trade.mistake && trade.mistake !== 'None'
+                    ? [trade.mistake]
+                    : [];
+
+            return {
+                id: trade.id || Date.now() + Math.random(),
+                date: trade.date || '',
+                executionTime: trade.executionTime || '',
+                session: trade.session || inferSessionFromTime(trade.executionTime || ''),
+                pair: (trade.pair || '').toUpperCase(),
+                type: trade.type || 'Buy',
+                bias: trade.bias || 'Neutral',
+                setup: trade.setup || 'Unnamed Setup',
+                entryModel: trade.entryModel || 'Pullback',
+                timeframe: trade.timeframe || '',
+                checklist: Array.isArray(trade.checklist)
+                    ? trade.checklist.filter(Boolean)
+                    : Array.isArray(trade.checklistItems)
+                        ? trade.checklistItems.filter(Boolean)
+                        : [],
+                riskPct: Number(trade.riskPct || 1),
+                result: trade.result || 'BE',
+                r: Number(trade.r || 0),
+                grade: trade.grade || 'B',
+                plan: trade.plan || 'Yes',
+                mistakes,
+                explainTrade: trade.explainTrade || trade.thesis || '',
+                explainMistakes: trade.explainMistakes || trade.lesson || '',
+                screenshots: {
+                    before: screenshots.before || '',
+                    during: screenshots.during || '',
+                    after: screenshots.after || ''
+                }
+            };
+        }
+
+        function normalizeReset(item) {
+            return {
+                id: item.id || Date.now() + Math.random(),
+                date: item.date || '',
+                time: item.time || '00:00',
+                balance: Number(item.balance || START_BALANCE),
+                note: item.note || ''
+            };
+        }
+
+        function normalizeState(raw) {
+            const base = defaultState();
+            const merged = {
+                ...base,
+                ...raw
+            };
+
+            merged.rules = Array.isArray(raw?.rules) && raw.rules.length
+                ? raw.rules.filter(Boolean)
+                : [...DEFAULT_RULES];
+            merged.checklistLibrary = Array.isArray(raw?.checklistLibrary) && raw.checklistLibrary.length
+                ? raw.checklistLibrary.filter(Boolean)
+                : [...DEFAULT_CHECKLIST_LIBRARY];
+            merged.trades = Array.isArray(raw?.trades) ? raw.trades.map(normalizeTrade) : [];
+            merged.balanceResets = Array.isArray(raw?.balanceResets) ? raw.balanceResets.map(normalizeReset) : [];
+            merged.backupInfo = {
+                connected: false,
+                lastBackupAt: raw?.backupInfo?.lastBackupAt || ''
+            };
+
+            merged.trades.sort((a, b) => buildDateTimeKey(a.date, a.executionTime).localeCompare(buildDateTimeKey(b.date, b.executionTime)));
+            merged.balanceResets.sort((a, b) => buildDateTimeKey(a.date, a.time).localeCompare(buildDateTimeKey(b.date, b.time)));
+            return merged;
+        }
+
+        function buildDateTimeKey(date, time) {
+            return `${date || '0000-00-00'}T${time || '00:00'}`;
+        }
+
+        async function openDb() {
+            return await new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = event => {
+                    const instance = event.target.result;
+                    if (!instance.objectStoreNames.contains(STORE_NAME)) {
+                        instance.createObjectStore(STORE_NAME);
+                    }
+                };
+                request.onsuccess = event => resolve(event.target.result);
+                request.onerror = event => reject(event.target.error);
+            });
+        }
+
+        async function dbGet(key) {
+            if (!db) return null;
+            return await new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.get(key);
+                request.onsuccess = () => resolve(request.result || null);
+                request.onerror = event => reject(event.target.error);
+            });
+        }
+
+        async function dbSet(key, value) {
+            if (!db) return;
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.put(value, key);
+                request.onsuccess = () => resolve();
+                request.onerror = event => reject(event.target.error);
+            });
+        }
+
+        async function loadStateFromVault() {
+            let loaded = null;
+            try {
+                db = await openDb();
+                loaded = await dbGet(STATE_KEY);
+            } catch (error) {
+                db = null;
+            }
+
+            if (loaded) {
+                return normalizeState(loaded);
+            }
+
+            const migrated = tryLegacyMigration();
+            return normalizeState(migrated || defaultState());
+        }
+
+        function tryLegacyMigration() {
+            for (const key of LEGACY_KEYS) {
+                const legacy = safeParse(localStorage.getItem(key));
+                if (Array.isArray(legacy)) {
+                    return {
+                        ...defaultState(),
+                        trades: legacy.map(normalizeTrade)
+                    };
+                }
+            }
+
+            const mirror = safeParse(localStorage.getItem('journalStateMirror'));
+            if (mirror) return mirror;
+            return null;
+        }
+
+        async function persistState(reason = 'save') {
+            if (!state) return;
+            state.lastSavedAt = new Date().toISOString();
+            try {
+                await dbSet(STATE_KEY, state);
+            } catch (error) {
+                localStorage.setItem('journalStateMirror', JSON.stringify(state));
+            }
+            localStorage.setItem('journalStateMirror', JSON.stringify(state));
+
+            if (backupFileHandle) {
+                try {
+                    await writeBackupToHandle();
+                    state.backupInfo.connected = true;
+                    state.backupInfo.lastBackupAt = new Date().toISOString();
+                    await dbSet(STATE_KEY, state);
+                    localStorage.setItem('journalStateMirror', JSON.stringify(state));
+                } catch (error) {
+                    state.backupInfo.connected = false;
+                }
+            }
+
+            updateStorageStatus(reason);
+        }
+
+        function buildBackupSnapshot() {
+            return {
+                app: 'Forex Journal Command Center',
+                version: state.version,
+                exportedAt: new Date().toISOString(),
+                state
+            };
+        }
+
+        async function connectBackupFile() {
+            if (!window.showSaveFilePicker) {
+                alert('Your browser does not support file-linked backup. Use Backup Snapshot instead.');
+                return;
+            }
+
+            try {
+                backupFileHandle = await window.showSaveFilePicker({
+                    suggestedName: 'forex-journal-vault.json',
+                    types: [{
+                        description: 'JSON Files',
+                        accept: { 'application/json': ['.json'] }
+                    }]
+                });
+                await writeBackupToHandle();
+                state.backupInfo.connected = true;
+                state.backupInfo.lastBackupAt = new Date().toISOString();
+                await persistState('backup connected');
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    alert('Could not connect a local backup file.');
+                }
+            }
+        }
+
+        async function writeBackupToHandle() {
+            if (!backupFileHandle) return;
+            const writable = await backupFileHandle.createWritable();
+            await writable.write(JSON.stringify(buildBackupSnapshot(), null, 2));
+            await writable.close();
+        }
+
+        function downloadVaultBackup() {
+            const payload = JSON.stringify(buildBackupSnapshot(), null, 2);
+            downloadFile(`forex-journal-vault-${stampDate()}.json`, payload, 'application/json');
+        }
+
+        function triggerBackupImport() {
+            document.getElementById('backupImportInput').value = '';
+            document.getElementById('backupImportInput').click();
+        }
+
+        async function handleBackupImport(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            try {
+                const text = await file.text();
+                const parsed = JSON.parse(text);
+                const importedState = normalizeState(parsed.state || parsed);
+                state = importedState;
+                await persistState('backup imported');
+                updateUI();
+            } catch (error) {
+                alert('That backup file could not be imported.');
+            }
+        }
+
+        function updateStorageStatus(reason = '') {
+            const target = document.getElementById('storageStatus');
+            if (!target || !state) return;
+            const lastSaved = state.lastSavedAt ? new Date(state.lastSavedAt).toLocaleString() : 'not yet';
+            const backup = state.backupInfo.connected
+                ? `Backup linked${state.backupInfo.lastBackupAt ? ` | ${new Date(state.backupInfo.lastBackupAt).toLocaleString()}` : ''}`
+                : 'IndexedDB only';
+            target.innerText = `${backup} | Saved ${lastSaved}`;
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(section => section.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(button => button.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            document.getElementById('btn-' + tab).classList.add('active');
+            if (isReady) updateUI();
+        }
+
+        function openModal() {
+            initializeTradeForm();
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        function closeTradeDetail() {
+            activeDetailTradeId = null;
+            document.getElementById('tradeDetailModal').classList.add('hidden');
+        }
+
+        function openRulesEditor() {
+            document.getElementById('rulesEditorInput').value = state.rules.join('\n');
+            document.getElementById('rulesEditorModal').classList.remove('hidden');
+        }
+
+        function closeRulesEditor() {
+            document.getElementById('rulesEditorModal').classList.add('hidden');
+        }
+
+        async function saveRulesEditor() {
+            const lines = document.getElementById('rulesEditorInput').value
+                .split('\n')
+                .map(line => line.trim())
+                .filter(Boolean);
+            state.rules = lines.length ? lines : [...DEFAULT_RULES];
+            await persistState('rules updated');
+            closeRulesEditor();
+            renderOperatingRules();
+        }
+
+        function openChecklistEditor() {
+            document.getElementById('checklistEditorInput').value = state.checklistLibrary.join('\n');
+            document.getElementById('checklistEditorModal').classList.remove('hidden');
+        }
+
+        function closeChecklistEditor() {
+            document.getElementById('checklistEditorModal').classList.add('hidden');
+        }
+
+        async function saveChecklistEditor() {
+            const lines = document.getElementById('checklistEditorInput').value
+                .split('\n')
+                .map(line => line.trim())
+                .filter(Boolean);
+            state.checklistLibrary = lines.length ? lines : [...DEFAULT_CHECKLIST_LIBRARY];
+            await persistState('checklist updated');
+            closeChecklistEditor();
+            renderChecklistLibrary();
+            renderChecklistSelector();
+            resetChecklistSelection([]);
+        }
+
+        function openResetBalanceModal() {
+            initializeResetForm();
+            document.getElementById('resetBalanceModal').classList.remove('hidden');
+        }
+
+        function closeResetBalanceModal() {
+            document.getElementById('resetBalanceModal').classList.add('hidden');
+        }
+
+        function initializeTradeForm() {
+            const nyNow = getNewYorkNow();
+            document.getElementById('mDateValue').value = nyNow.date;
+            document.getElementById('mDateDisplay').innerText = formatDisplayDate(nyNow.date);
+            document.getElementById('mExecutionTime').value = nyNow.time;
+            syncSessionFromExecutionTime();
+            resetMistakeSelection([]);
+            resetChecklistSelection([]);
+        }
+
+        function initializeResetForm() {
+            const nyNow = getNewYorkNow();
+            document.getElementById('resetDateValue').value = nyNow.date;
+            document.getElementById('resetDateDisplay').innerText = formatDisplayDate(nyNow.date);
+            document.getElementById('resetTimeValue').value = nyNow.time;
+            document.getElementById('resetBalanceValue').value = '';
+            document.getElementById('resetNoteValue').value = '';
+        }
+
+        function syncSessionFromExecutionTime() {
+            const timeValue = document.getElementById('mExecutionTime').value;
+            document.getElementById('mSessionDisplay').innerText = inferSessionFromTime(timeValue);
+        }
+
+        function resetMistakeSelection(selected) {
+            document.querySelectorAll('[data-mistake-chip]').forEach(chip => {
+                const value = chip.dataset.value;
+                const active = selected.includes(value);
+                chip.classList.toggle('active', active);
+                const checkbox = chip.querySelector('input');
+                if (checkbox) checkbox.checked = active;
+            });
+        }
+
+        function resetChecklistSelection(selected) {
+            document.querySelectorAll('[data-checklist-chip]').forEach(chip => {
+                const value = chip.dataset.value;
+                const active = selected.includes(value);
+                chip.classList.toggle('active', active);
+                const checkbox = chip.querySelector('input');
+                if (checkbox) checkbox.checked = active;
+            });
+        }
+
+        function toggleMistakeOption(value) {
+            const chip = Array.from(document.querySelectorAll('[data-mistake-chip]')).find(item => item.dataset.value === value);
+            if (!chip) return;
+            const checkbox = chip.querySelector('input');
+            const next = !checkbox.checked;
+            checkbox.checked = next;
+            chip.classList.toggle('active', next);
+        }
+
+        function toggleChecklistOption(value) {
+            const chip = Array.from(document.querySelectorAll('[data-checklist-chip]')).find(item => item.dataset.value === value);
+            if (!chip) return;
+            const checkbox = chip.querySelector('input');
+            const next = !checkbox.checked;
+            checkbox.checked = next;
+            chip.classList.toggle('active', next);
+        }
+
+        function escapeQuotes(text) {
+            return text.replace(/"/g, '&quot;');
+        }
+
+        function getSelectedMistakes() {
+            return Array.from(document.querySelectorAll('[data-mistake-chip] input:checked')).map(input => input.value);
+        }
+
+        function getSelectedChecklist() {
+            return Array.from(document.querySelectorAll('[data-checklist-chip] input:checked')).map(input => input.value);
+        }
+
+        function calcR() {
+            const sl = parseFloat(document.getElementById('mSL').value) || 0;
+            const tp = parseFloat(document.getElementById('mTP').value) || 0;
+            const result = document.getElementById('mResult').value;
+            let rValue = 0;
+
+            if (sl > 0 && tp > 0) {
+                if (result === 'Win') rValue = tp / sl;
+                if (result === 'Loss') rValue = -1;
+                if (result === 'BE') rValue = 0;
+            }
+
+            document.getElementById('displayR').innerText = rValue.toFixed(2);
+            return rValue;
+        }
+
+        function handlePreview(input, previewId) {
+            const target = document.getElementById(previewId);
+            const file = input.files && input.files[0];
+            if (!file) {
+                target.src = IMAGE_PLACEHOLDER;
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = event => {
+                target.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function processImageFile(file) {
+            if (!file) return '';
+            return await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const image = new Image();
+                    image.onload = () => {
+                        const maxWidth = 1600;
+                        const maxHeight = 1000;
+                        let { width, height } = image;
+                        const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
+                        width = Math.round(width * ratio);
+                        height = Math.round(height * ratio);
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const context = canvas.getContext('2d');
+                        context.drawImage(image, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.82));
+                    };
+                    image.onerror = reject;
+                    image.src = reader.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function loadScreenshotBundle() {
+            return {
+                before: await processImageFile(document.getElementById('mScreenshotBefore').files[0]),
+                during: await processImageFile(document.getElementById('mScreenshotDuring').files[0]),
+                after: await processImageFile(document.getElementById('mScreenshotAfter').files[0])
+            };
+        }
+
+        function resetPreviews() {
+            ['previewBefore', 'previewDuring', 'previewAfter'].forEach(id => {
+                document.getElementById(id).src = IMAGE_PLACEHOLDER;
+            });
+        }
+
+        async function submitTrade(event) {
+            event.preventDefault();
+            const screenshots = await loadScreenshotBundle();
+            const dateValue = document.getElementById('mDateValue').value;
+
+            if (!dateValue) {
+                alert('Please select a trade date.');
+                return;
+            }
+
+            const newTrade = normalizeTrade({
+                id: Date.now(),
+                date: dateValue,
+                executionTime: document.getElementById('mExecutionTime').value,
+                session: inferSessionFromTime(document.getElementById('mExecutionTime').value),
+                pair: document.getElementById('mPair').value,
+                type: document.getElementById('mType').value,
+                bias: document.getElementById('mBias').value,
+                setup: document.getElementById('mSetup').value,
+                entryModel: document.getElementById('mEntryModel').value,
+                timeframe: document.getElementById('mTimeframe').value,
+                checklist: getSelectedChecklist(),
+                riskPct: document.getElementById('mRiskPct').value,
+                result: document.getElementById('mResult').value,
+                r: parseFloat(calcR().toFixed(2)),
+                grade: document.getElementById('mGrade').value,
+                plan: document.getElementById('mPlan').value,
+                mistakes: getSelectedMistakes(),
+                explainTrade: document.getElementById('mExplainTrade').value.trim(),
+                explainMistakes: document.getElementById('mExplainMistakes').value.trim(),
+                screenshots
+            });
+
+            state.trades.push(newTrade);
+            state.trades.sort((a, b) => buildDateTimeKey(a.date, a.executionTime).localeCompare(buildDateTimeKey(b.date, b.executionTime)));
+            await persistState('trade added');
+
+            event.target.reset();
+            document.getElementById('mRiskPct').value = 1;
+            document.getElementById('displayR').innerText = '0.00';
+            resetPreviews();
+            initializeTradeForm();
+            closeModal();
+            updateUI();
+        }
+
+        async function saveBalanceReset() {
+            const date = document.getElementById('resetDateValue').value;
+            const time = document.getElementById('resetTimeValue').value || '00:00';
+            const balance = parseFloat(document.getElementById('resetBalanceValue').value);
+
+            if (!date || Number.isNaN(balance) || balance <= 0) {
+                alert('Choose a reset date and enter a valid balance.');
+                return;
+            }
+
+            state.balanceResets.push(normalizeReset({
+                id: Date.now(),
+                date,
+                time,
+                balance,
+                note: document.getElementById('resetNoteValue').value.trim()
+            }));
+            state.balanceResets.sort((a, b) => buildDateTimeKey(a.date, a.time).localeCompare(buildDateTimeKey(b.date, b.time)));
+            await persistState('balance reset');
+            closeResetBalanceModal();
+            updateUI();
+        }
+
+        async function deleteTrade(id) {
+            const trade = state.trades.find(item => item.id === id);
+            if (!trade) return;
+            const shouldDelete = window.confirm(`Delete the ${trade.pair} trade from ${trade.date}? This cannot be undone.`);
+            if (!shouldDelete) return;
+            state.trades = state.trades.filter(item => item.id !== id);
+            await persistState('trade deleted');
+            if (activeDetailTradeId === id) closeTradeDetail();
+            updateUI();
+        }
+
+        function deleteTradeFromDetail() {
+            if (activeDetailTradeId == null) return;
+            deleteTrade(activeDetailTradeId);
+        }
+
+        function countScreenshots(screenshots) {
+            return ['before', 'during', 'after'].filter(key => screenshots && screenshots[key]).length;
+        }
+
+        function getExecutionBucket(timeValue) {
+            if (!timeValue) return 'Unknown';
+            const [hourText] = timeValue.split(':');
+            const hour = Number(hourText);
+            if (Number.isNaN(hour)) return 'Unknown';
+            return `${String(hour).padStart(2, '0')}:00-${String(hour).padStart(2, '0')}:59`;
+        }
+
+        function getChecklistComboKey(items) {
+            if (!items || !items.length) return 'No checklist';
+            return [...items].sort().join(' + ');
+        }
+
+        function getBestPerformanceMetric(metricMap, minTrades = 1) {
+            const entries = Object.entries(metricMap || {}).map(([label, data]) => ({
+                label,
+                trades: data.trades || 0,
+                totalGainPct: data.totalGainPct || 0,
+                avgGainPct: data.trades ? (data.totalGainPct / data.trades) : 0
+            })).filter(item => item.trades >= minTrades);
+
+            if (!entries.length) {
+                return { label: 'None', trades: 0, totalGainPct: 0, avgGainPct: 0 };
+            }
+
+            return entries.sort((a, b) => {
+                if (b.avgGainPct !== a.avgGainPct) return b.avgGainPct - a.avgGainPct;
+                return b.trades - a.trades;
+            })[0];
+        }
+
+        function buildAnalytics() {
+            let balance = START_BALANCE;
+            let segmentBaseline = START_BALANCE;
+            let segmentPeak = START_BALANCE;
+            let maxDrawdownPct = 0;
+            let wins = 0;
+            let totalR = 0;
+            let grossProfit = 0;
+            let grossLoss = 0;
+            let currentLosingStreak = 0;
+            let maxLosingStreak = 0;
+            let planYesCount = 0;
+            let gradeAorBetterCount = 0;
+            let checklistCountTotal = 0;
+            let riskPctTotal = 0;
+            let largestWinPct = 0;
+            let largestLossPct = 0;
+            const pairData = {};
+            const sessionData = {};
+            const setupData = {};
+            const mistakeData = {};
+            const executionTimeData = {};
+            const checklistItemData = {};
+            const checklistComboData = {};
+            const equityPoints = [START_BALANCE];
+            const labels = ['Start'];
+            const tradeRows = [];
+            const dailyMap = {};
+            const monthlyRollup = {};
+
+            const events = [
+                ...state.balanceResets.map(reset => ({ type: 'reset', ...reset })),
+                ...state.trades.map(trade => ({ type: 'trade', ...trade }))
+            ].sort((a, b) => {
+                const aKey = buildDateTimeKey(a.date, a.type === 'reset' ? a.time : a.executionTime);
+                const bKey = buildDateTimeKey(b.date, b.type === 'reset' ? b.time : b.executionTime);
+                if (aKey === bKey) return a.type === 'reset' ? -1 : 1;
+                return aKey.localeCompare(bKey);
+            });
+
+            events.forEach(event => {
+                if (event.type === 'reset') {
+                    balance = event.balance;
+                    segmentBaseline = event.balance;
+                    segmentPeak = event.balance;
+                    labels.push(`Reset ${event.date}`);
+                    equityPoints.push(Number(balance.toFixed(2)));
+                    return;
+                }
+
+                const balanceBefore = balance;
+                const gainPct = (event.riskPct || 0) * event.r;
+                const riskAmount = balanceBefore * ((event.riskPct || 0) / 100);
+                const pnl = riskAmount * event.r;
+                balance += pnl;
+                segmentPeak = Math.max(segmentPeak, balance);
+                const drawdownPct = segmentPeak ? ((balance - segmentPeak) / segmentPeak) * 100 : 0;
+                maxDrawdownPct = Math.min(maxDrawdownPct, drawdownPct);
+
+                totalR += event.r;
+                labels.push(event.date);
+                equityPoints.push(Number(balance.toFixed(2)));
+
+                if (event.r > 0) {
+                    wins += 1;
+                    grossProfit += event.r;
+                    currentLosingStreak = 0;
+                } else if (event.r < 0) {
+                    grossLoss += Math.abs(event.r);
+                    currentLosingStreak += 1;
+                    maxLosingStreak = Math.max(maxLosingStreak, currentLosingStreak);
+                }
+
+                if (event.plan === 'Yes') planYesCount += 1;
+                if (event.grade === 'A+' || event.grade === 'A') gradeAorBetterCount += 1;
+
+                checklistCountTotal += (event.checklist || []).length;
+                riskPctTotal += Number(event.riskPct || 0);
+                largestWinPct = Math.max(largestWinPct, gainPct);
+                largestLossPct = Math.min(largestLossPct, gainPct);
+
+                pairData[event.pair] = (pairData[event.pair] || 0) + gainPct;
+                sessionData[event.session] = (sessionData[event.session] || 0) + gainPct;
+                setupData[event.setup] = (setupData[event.setup] || 0) + 1;
+                const executionBucket = getExecutionBucket(event.executionTime);
+                if (!executionTimeData[executionBucket]) executionTimeData[executionBucket] = { totalGainPct: 0, trades: 0 };
+                executionTimeData[executionBucket].totalGainPct += gainPct;
+                executionTimeData[executionBucket].trades += 1;
+                (event.checklist || []).forEach(item => {
+                    if (!checklistItemData[item]) checklistItemData[item] = { totalGainPct: 0, trades: 0 };
+                    checklistItemData[item].totalGainPct += gainPct;
+                    checklistItemData[item].trades += 1;
+                });
+                const comboKey = getChecklistComboKey(event.checklist || []);
+                if (!checklistComboData[comboKey]) checklistComboData[comboKey] = { totalGainPct: 0, trades: 0 };
+                checklistComboData[comboKey].totalGainPct += gainPct;
+                checklistComboData[comboKey].trades += 1;
+                (event.mistakes || []).forEach(mistake => {
+                    mistakeData[mistake] = (mistakeData[mistake] || 0) + 1;
+                });
+
+                const dateKey = event.date;
+                if (!dailyMap[dateKey]) {
+                    dailyMap[dateKey] = {
+                        date: dateKey,
+                        pnl: 0,
+                        trades: 0,
+                        gainPct: 0,
+                        resets: 0
+                    };
+                }
+                dailyMap[dateKey].pnl += pnl;
+                dailyMap[dateKey].trades += 1;
+                dailyMap[dateKey].gainPct += gainPct;
+
+                const monthKey = (event.date || '').slice(0, 7) || 'Unknown';
+                if (!monthlyRollup[monthKey]) {
+                    monthlyRollup[monthKey] = {
+                        month: monthKey,
+                        startBalance: balanceBefore,
+                        endBalance: balanceBefore,
+                        totalR: 0,
+                        trades: 0
+                    };
+                }
+                monthlyRollup[monthKey].endBalance = balance;
+                monthlyRollup[monthKey].totalR += event.r;
+                monthlyRollup[monthKey].trades += 1;
+
+                tradeRows.push({
+                    ...event,
+                    balanceBefore,
+                    balanceAfter: balance,
+                    gainPct,
+                    pnl,
+                    drawdownPct,
+                    screenCount: countScreenshots(event.screenshots),
+                    executionBucket,
+                    checklistComboKey: comboKey
+                });
+            });
+
+            state.balanceResets.forEach(reset => {
+                if (!dailyMap[reset.date]) {
+                    dailyMap[reset.date] = {
+                        date: reset.date,
+                        pnl: 0,
+                        trades: 0,
+                        gainPct: 0,
+                        resets: 0
+                    };
+                }
+                dailyMap[reset.date].resets += 1;
+            });
+
+            const monthlyRows = Object.values(monthlyRollup).map(month => ({
+                ...month,
+                gainPct: month.startBalance ? ((month.endBalance - month.startBalance) / month.startBalance) * 100 : 0
+            })).sort((a, b) => a.month.localeCompare(b.month));
+
+            return {
+                balance,
+                currentBaseline: segmentBaseline,
+                wins,
+                totalR,
+                grossProfit,
+                grossLoss,
+                maxLosingStreak,
+                planYesCount,
+                gradeAorBetterCount,
+                checklistCountTotal,
+                riskPctTotal,
+                largestWinPct,
+                largestLossPct,
+                maxDrawdownPct,
+                pairData,
+                sessionData,
+                setupData,
+                mistakeData,
+                executionTimeData,
+                checklistItemData,
+                checklistComboData,
+                equityPoints,
+                labels,
+                tradeRows,
+                dailyMap,
+                monthlyRows,
+                monthStreaks: computeLosingMonthStreaks(monthlyRows),
+                currentNetGainPct: segmentBaseline ? ((balance - segmentBaseline) / segmentBaseline) * 100 : 0
+            };
+        }
+
+        function computeLosingMonthStreaks(monthlyRows) {
+            let longest = 0;
+            let current = 0;
+            let activeRun = [];
+            let longestRun = [];
+
+            monthlyRows.forEach(month => {
+                if (month.gainPct < 0) {
+                    current += 1;
+                    activeRun.push(month.month);
+                    if (current > longest) {
+                        longest = current;
+                        longestRun = [...activeRun];
+                    }
+                } else {
+                    current = 0;
+                    activeRun = [];
+                }
+            });
+
+            const worstMonth = monthlyRows.reduce((worst, month) => {
+                if (!worst || month.gainPct < worst.gainPct) return month;
+                return worst;
+            }, null);
+
+            return { longest, current, longestRun, worstMonth };
+        }
+
+        function updateUI() {
+            if (!state) return;
+            const analytics = buildAnalytics();
+            latestAnalytics = analytics;
+            const tradeCount = state.trades.length;
+            const winRate = tradeCount ? Math.round((analytics.wins / tradeCount) * 100) : 0;
+            const expectancy = tradeCount ? analytics.totalR / tradeCount : 0;
+            const profitFactor = analytics.grossLoss ? analytics.grossProfit / analytics.grossLoss : analytics.grossProfit ? analytics.grossProfit : 0;
+            const planRate = tradeCount ? Math.round((analytics.planYesCount / tradeCount) * 100) : 0;
+            const avgChecklistCount = tradeCount ? analytics.checklistCountTotal / tradeCount : 0;
+            const avgRisk = tradeCount ? analytics.riskPctTotal / tradeCount : 0;
+            const gradeRate = tradeCount ? Math.round((analytics.gradeAorBetterCount / tradeCount) * 100) : 0;
+            const bestPair = getBestCategory(analytics.pairData);
+            const bestSession = getBestCategory(analytics.sessionData);
+            const topMistake = getTopMistake(analytics.mistakeData);
+            const bestExecutionMetric = getBestPerformanceMetric(analytics.executionTimeData);
+            const bestChecklistItemMetric = getBestPerformanceMetric(analytics.checklistItemData);
+            const bestChecklistComboMetric = getBestPerformanceMetric(analytics.checklistComboData, 2).trades
+                ? getBestPerformanceMetric(analytics.checklistComboData, 2)
+                : getBestPerformanceMetric(analytics.checklistComboData);
+            const worstMonth = analytics.monthStreaks.worstMonth;
+
+            renderOperatingRules();
+            renderChecklistLibrary();
+            renderTable(analytics.tradeRows);
+            renderCharts(analytics);
+            renderDailySummary(analytics);
+            renderResetCheckpointList();
+            renderChecklistComboLeaders(analytics);
+
+            document.getElementById('statBal').innerText = formatCurrency(analytics.balance);
+            document.getElementById('statGain').innerText = `${analytics.currentNetGainPct.toFixed(2)}%`;
+            document.getElementById('statWR').innerText = `${winRate}%`;
+            document.getElementById('statExpectancy').innerText = `${expectancy.toFixed(2)}R`;
+            document.getElementById('statProfitFactor').innerText = profitFactor.toFixed(2);
+            document.getElementById('statPlanRate').innerText = `${planRate}%`;
+            document.getElementById('statDrawdown').innerText = `${Math.abs(analytics.maxDrawdownPct).toFixed(2)}%`;
+            document.getElementById('statLosingMonths').innerText = analytics.monthStreaks.longest;
+            document.getElementById('statStreak').innerText = analytics.maxLosingStreak;
+
+            document.getElementById('heroBalance').innerText = formatCurrency(analytics.balance, 0);
+            document.getElementById('heroExpectancy').innerText = `${expectancy.toFixed(2)}R`;
+            document.getElementById('heroDrawdown').innerText = `${Math.abs(analytics.maxDrawdownPct).toFixed(2)}%`;
+
+            document.getElementById('bestPair').innerText = bestPair.label;
+            document.getElementById('bestSession').innerText = bestSession.label;
+            document.getElementById('bestExecutionTime').innerText = bestExecutionMetric.label;
+            document.getElementById('bestGradeRate').innerText = `${gradeRate}%`;
+            document.getElementById('avgRisk').innerText = `${avgRisk.toFixed(2)}%`;
+            document.getElementById('avgChecklistCount').innerText = avgChecklistCount.toFixed(1);
+            document.getElementById('bestChecklistItem').innerText = bestChecklistItemMetric.label;
+            document.getElementById('bestChecklistCombo').innerText = bestChecklistComboMetric.label;
+            document.getElementById('bestExecutionWindow').innerText = bestExecutionMetric.label;
+            document.getElementById('largestWin').innerText = `${analytics.largestWinPct.toFixed(2)}%`;
+            document.getElementById('largestLoss').innerText = `${analytics.largestLossPct.toFixed(2)}%`;
+            document.getElementById('longestMonthStreak').innerText = analytics.monthStreaks.longest;
+            document.getElementById('currentMonthStreak').innerText = analytics.monthStreaks.current;
+            document.getElementById('worstMonth').innerText = worstMonth ? `${worstMonth.month} (${worstMonth.gainPct.toFixed(2)}%)` : 'None';
+            document.getElementById('monthWarning').innerText = buildMonthWarning(analytics.monthStreaks);
+            document.getElementById('topMistake').innerText = topMistake;
+            document.getElementById('coachingNote').innerText = buildCoachingNote({
+                tradeCount,
+                expectancy,
+                planRate,
+                topMistake,
+                avgChecklist: avgChecklistCount,
+                drawdown: Math.abs(analytics.maxDrawdownPct),
+                losingMonthStreak: analytics.monthStreaks.longest
+            });
+
+            updateStorageStatus();
+        }
+
+        function renderOperatingRules() {
+            const target = document.getElementById('operatingRulesList');
+            target.innerHTML = '';
+            state.rules.forEach((rule, index) => {
+                target.insertAdjacentHTML('beforeend', `
+                    <div class="mini-row">
+                        <span>${rule}</span>
+                        <strong class="text-slate-400">Rule ${index + 1}</strong>
+                    </div>
+                `);
+            });
+        }
+
+        function renderChecklistLibrary() {
+            const target = document.getElementById('checklistLibraryList');
+            target.innerHTML = '';
+            state.checklistLibrary.forEach((item, index) => {
+                target.insertAdjacentHTML('beforeend', `
+                    <div class="mini-row">
+                        <span>${item}</span>
+                        <strong class="text-slate-400">C${index + 1}</strong>
+                    </div>
+                `);
+            });
+        }
+
+        function renderTable(tradeRows) {
+            const table = document.getElementById('logTableBody');
+            table.innerHTML = '';
+
+            tradeRows.forEach(row => {
+                const gainClass = row.gainPct > 0 ? 'text-emerald-400' : row.gainPct < 0 ? 'text-rose-400' : 'text-slate-300';
+                const planClass = row.plan === 'Yes' ? 'chip chip-green' : 'chip chip-red';
+                const mistakeLabel = row.mistakes.length ? row.mistakes.length : '0';
+                table.insertAdjacentHTML('afterbegin', `
+                    <tr>
+                        <td class="p-4 text-slate-400">${row.date || '-'}</td>
+                        <td class="p-4">${row.executionTime || '--:--'}</td>
+                        <td class="p-4 font-bold">${row.pair || '-'}</td>
+                        <td class="p-4">${row.bias}</td>
+                        <td class="p-4">${row.session}</td>
+                        <td class="p-4">
+                            <div class="font-bold text-amber-300">${row.setup}</div>
+                            <div class="text-[10px] uppercase tracking-[0.08em] text-slate-500">${row.entryModel}</div>
+                        </td>
+                        <td class="p-4"><span class="rounded-full bg-white/5 px-2 py-1 font-bold">${row.grade}</span></td>
+                        <td class="p-4">${Number(row.riskPct).toFixed(2)}%</td>
+                        <td class="p-4"><span class="${planClass}">${row.plan}</span></td>
+                        <td class="p-4">${row.result}</td>
+                        <td class="p-4 font-bold ${row.r > 0 ? 'text-emerald-400' : row.r < 0 ? 'text-rose-400' : 'text-slate-300'}">${row.r.toFixed(2)}R</td>
+                        <td class="p-4 font-bold ${gainClass}">${row.gainPct.toFixed(2)}%</td>
+                        <td class="p-4">${row.screenCount}/3</td>
+                        <td class="p-4">${mistakeLabel}</td>
+                        <td class="p-4 text-right font-mono">${formatCurrency(row.balanceAfter)}</td>
+                        <td class="p-4 text-right"><button onclick="openTradeDetail(${row.id})" class="ghost-btn px-3 py-2 rounded-md font-bold text-[11px]">Review</button></td>
+                        <td class="p-4 text-right"><button onclick="deleteTrade(${row.id})" class="ghost-btn px-3 py-2 rounded-md font-bold text-[11px] text-rose-200">Delete</button></td>
+                    </tr>
+                `);
+            });
+        }
+
+        function renderChecklistComboLeaders(analytics) {
+            const target = document.getElementById('checklistComboLeaders');
+            const ranked = Object.entries(analytics.checklistComboData)
+                .map(([label, data]) => ({
+                    label,
+                    trades: data.trades,
+                    avgGainPct: data.trades ? data.totalGainPct / data.trades : 0
+                }))
+                .filter(item => item.trades > 0)
+                .sort((a, b) => {
+                    if (b.avgGainPct !== a.avgGainPct) return b.avgGainPct - a.avgGainPct;
+                    return b.trades - a.trades;
+                });
+            const combos = (ranked.some(item => item.trades >= 2) ? ranked.filter(item => item.trades >= 2) : ranked).slice(0, 3);
+
+            if (!combos.length) {
+                target.innerHTML = '<p class="text-sm text-slate-400">Add checklist-tagged trades to see your strongest confluence combinations.</p>';
+                return;
+            }
+
+            target.innerHTML = combos.map((combo, index) => `
+                <div class="metric-block">
+                    <div class="flex items-center justify-between gap-3">
+                        <strong class="text-white">Combo ${index + 1}</strong>
+                        <span class="${combo.avgGainPct >= 0 ? 'text-emerald-300' : 'text-rose-300'} font-extrabold">${combo.avgGainPct.toFixed(2)}%</span>
+                    </div>
+                    <p class="text-sm text-slate-300 mt-2">${combo.label}</p>
+                    <p class="text-xs text-slate-500 mt-2">${combo.trades} trade${combo.trades === 1 ? '' : 's'}</p>
+                </div>
+            `).join('');
+        }
+
+        function openTradeDetail(id) {
+            const analytics = latestAnalytics || buildAnalytics();
+            const trade = analytics.tradeRows.find(item => item.id === id);
+            if (!trade) return;
+
+            activeDetailTradeId = id;
+            document.getElementById('detailTitle').innerText = `${trade.pair} | ${trade.date} | ${trade.setup}`;
+            document.getElementById('detailGain').innerText = `${trade.gainPct.toFixed(2)}%`;
+            document.getElementById('detailBalance').innerText = formatCurrency(trade.balanceAfter);
+            document.getElementById('detailExecutionTime').innerText = trade.executionTime || '--:--';
+            document.getElementById('detailPlan').innerText = trade.plan;
+            document.getElementById('detailMistakes').innerText = trade.mistakes.length ? trade.mistakes.join(', ') : 'None';
+            document.getElementById('detailChecklist').innerText = trade.checklist.length ? trade.checklist.join(', ') : 'None selected.';
+            document.getElementById('detailExplainTrade').innerText = trade.explainTrade || 'No explanation recorded.';
+            document.getElementById('detailExplainMistakes').innerText = trade.explainMistakes || 'No mistakes recorded.';
+            document.getElementById('detailBefore').src = trade.screenshots.before || IMAGE_PLACEHOLDER;
+            document.getElementById('detailDuring').src = trade.screenshots.during || IMAGE_PLACEHOLDER;
+            document.getElementById('detailAfter').src = trade.screenshots.after || IMAGE_PLACEHOLDER;
+            document.getElementById('tradeDetailModal').classList.remove('hidden');
+        }
+
+        function openImageZoom(src, title) {
+            if (!src) return;
+            imageZoomLevel = 1;
+            document.getElementById('zoomImage').src = src;
+            document.getElementById('zoomImageTitle').innerText = title;
+            applyZoom();
+            document.getElementById('imageZoomModal').classList.remove('hidden');
+        }
+
+        function closeImageZoom() {
+            document.getElementById('imageZoomModal').classList.add('hidden');
+        }
+
+        function adjustZoom(delta) {
+            imageZoomLevel = Math.min(4, Math.max(1, imageZoomLevel + delta));
+            applyZoom();
+        }
+
+        function resetZoom() {
+            imageZoomLevel = 1;
+            applyZoom();
+        }
+
+        function applyZoom() {
+            document.getElementById('zoomImage').style.transform = `scale(${imageZoomLevel})`;
+        }
+
+        function renderCharts(analytics) {
+            Chart.defaults.color = '#93a8be';
+            Chart.defaults.font.family = 'Manrope';
+
+            const orderedPairs = sortEntries(analytics.pairData);
+            const orderedSessions = sortEntries(analytics.sessionData);
+            const orderedSetups = sortEntries(analytics.setupData);
+            const orderedMistakes = sortEntries(analytics.mistakeData);
+            const orderedExecution = Object.entries(analytics.executionTimeData)
+                .map(([label, data]) => ({
+                    label,
+                    avgGainPct: data.trades ? data.totalGainPct / data.trades : 0
+                }))
+                .sort((a, b) => a.label.localeCompare(b.label));
+            const monthlyRows = analytics.monthlyRows.length ? analytics.monthlyRows : [{ month: 'No Data', gainPct: 0 }];
+
+            recreateChart('equity', 'equityChart', {
+                type: 'line',
+                data: {
+                    labels: analytics.labels,
+                    datasets: [{
+                        label: 'Balance',
+                        data: analytics.equityPoints,
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.16)',
+                        fill: true,
+                        borderWidth: 3,
+                        tension: 0.28,
+                        pointRadius: 0
+                    }]
+                },
+                options: lineChartOptions()
+            });
+
+            recreateChart('session', 'sessionChart', {
+                type: 'bar',
+                data: {
+                    labels: orderedSessions.map(item => item[0]),
+                    datasets: [{
+                        data: orderedSessions.map(item => Number(item[1].toFixed(2))),
+                        backgroundColor: buildPalette(orderedSessions.length, ['#22c55e', '#38bdf8', '#f59e0b', '#f97316', '#fb7185', '#a78bfa']),
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: barChartOptions('Net % Gain by Session')
+            });
+
+            recreateChart('pair', 'pairChart', {
+                type: 'bar',
+                data: {
+                    labels: orderedPairs.map(item => item[0]),
+                    datasets: [{
+                        data: orderedPairs.map(item => Number(item[1].toFixed(2))),
+                        backgroundColor: buildPalette(orderedPairs.length, ['#06b6d4', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']),
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: barChartOptions('Net % Gain by Pair')
+            });
+
+            recreateChart('setup', 'setupChart', {
+                type: 'doughnut',
+                data: {
+                    labels: orderedSetups.map(item => item[0]),
+                    datasets: [{
+                        data: orderedSetups.map(item => item[1]),
+                        backgroundColor: buildPalette(orderedSetups.length, ['#f59e0b', '#22c55e', '#38bdf8', '#fb7185', '#a855f7', '#f97316', '#14b8a6']),
+                        hoverOffset: 10
+                    }]
+                },
+                options: donutChartOptions()
+            });
+
+            recreateChart('mistake', 'mistakeChart', {
+                type: 'polarArea',
+                data: {
+                    labels: orderedMistakes.map(item => item[0]),
+                    datasets: [{
+                        data: orderedMistakes.map(item => item[1]),
+                        backgroundColor: buildPalette(orderedMistakes.length, ['rgba(251, 113, 133, 0.82)', 'rgba(249, 115, 22, 0.82)', 'rgba(250, 204, 21, 0.82)', 'rgba(56, 189, 248, 0.82)', 'rgba(167, 139, 250, 0.82)', 'rgba(34, 197, 94, 0.82)'])
+                    }]
+                },
+                options: polarChartOptions()
+            });
+
+            recreateChart('monthly', 'monthlyChart', {
+                type: 'bar',
+                data: {
+                    labels: monthlyRows.map(item => item.month),
+                    datasets: [{
+                        label: 'Monthly Gain %',
+                        data: monthlyRows.map(item => Number(item.gainPct.toFixed(2))),
+                        backgroundColor: monthlyRows.map(item => item.gainPct >= 0 ? '#22c55e' : '#fb7185'),
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: barChartOptions('Monthly Gain %')
+            });
+
+            recreateChart('execution', 'executionChart', {
+                type: 'bar',
+                data: {
+                    labels: orderedExecution.length ? orderedExecution.map(item => item.label) : ['No Data'],
+                    datasets: [{
+                        data: orderedExecution.length ? orderedExecution.map(item => Number(item.avgGainPct.toFixed(2))) : [0],
+                        backgroundColor: orderedExecution.length
+                            ? orderedExecution.map(item => item.avgGainPct >= 0 ? '#38bdf8' : '#fb7185')
+                            : ['#334155'],
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: barChartOptions('Average % Gain by Execution Time')
+            });
+        }
+
+        function renderDailySummary(analytics) {
+            if (!dailySummaryMonthCursor) {
+                const ny = getNewYorkNow();
+                dailySummaryMonthCursor = { year: ny.year, month: ny.month };
+            }
+
+            const year = dailySummaryMonthCursor.year;
+            const month = dailySummaryMonthCursor.month;
+            const target = document.getElementById('dailySummaryGrid');
+            const weeklyTarget = document.getElementById('weeklySummaryList');
+            const label = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(new Date(year, month, 1));
+            document.getElementById('dailySummaryMonthLabel').innerText = label;
+
+            const firstDay = new Date(year, month, 1);
+            const startIndex = firstDay.getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const totalWeeks = Math.ceil((startIndex + daysInMonth) / 7);
+            const prevMonthDays = new Date(year, month, 0).getDate();
+            const todayKey = getNewYorkNow().date;
+
+            const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+            const monthEntries = Object.values(analytics.dailyMap).filter(day => day.date.startsWith(monthPrefix));
+            const monthPnl = monthEntries.reduce((sum, entry) => sum + entry.pnl, 0);
+            const monthDays = monthEntries.filter(entry => entry.trades > 0).length;
+            document.getElementById('dailySummaryPnl').innerText = formatCurrency(monthPnl);
+            document.getElementById('dailySummaryPnl').className = monthPnl >= 0 ? 'text-emerald-400' : 'text-rose-300';
+            document.getElementById('dailySummaryDays').innerText = monthDays;
+
+            const cells = [];
+            for (let i = 0; i < 42; i++) {
+                let cellDate;
+                let dayNumber;
+                let muted = false;
+
+                if (i < startIndex) {
+                    dayNumber = prevMonthDays - startIndex + i + 1;
+                    cellDate = new Date(year, month - 1, dayNumber);
+                    muted = true;
+                } else if (i >= startIndex + daysInMonth) {
+                    dayNumber = i - startIndex - daysInMonth + 1;
+                    cellDate = new Date(year, month + 1, dayNumber);
+                    muted = true;
+                } else {
+                    dayNumber = i - startIndex + 1;
+                    cellDate = new Date(year, month, dayNumber);
+                }
+
+                const key = formatIsoDate(cellDate);
+                const info = analytics.dailyMap[key];
+                const classes = ['calendar-cell'];
+                if (muted) classes.push('muted');
+                if (info && info.pnl > 0) classes.push('positive');
+                if (info && info.pnl < 0) classes.push('negative');
+                if (key === todayKey) classes.push('today');
+                if (info && info.resets > 0) classes.push('reset-day');
+
+                const tradesCount = info && info.trades ? `${info.trades} <i class="fa-solid fa-arrow-right-arrow-left text-[10px]"></i>` : '';
+                const pnlText = info && info.trades ? formatCurrency(info.pnl) : '';
+
+                cells.push(`
+                    <div class="${classes.join(' ')}">
+                        <span class="day-no">${dayNumber}</span>
+                        <div class="day-meta">
+                            <span>${tradesCount}</span>
+                            <strong class="${!info || !info.trades ? 'text-slate-500' : info.pnl >= 0 ? 'text-emerald-300' : 'text-rose-300'}">${pnlText}</strong>
+                        </div>
+                    </div>
+                `);
+            }
+
+            target.innerHTML = cells.join('');
+            renderWeeklySummary(year, month, analytics, totalWeeks);
+        }
+
+        function renderWeeklySummary(year, month, analytics, totalWeeks) {
+            const weeklyTarget = document.getElementById('weeklySummaryList');
+            weeklyTarget.innerHTML = '';
+
+            for (let weekIndex = 0; weekIndex < totalWeeks; weekIndex++) {
+                const startDay = weekIndex * 7 + 1;
+                const endDay = Math.min(startDay + 6, new Date(year, month + 1, 0).getDate());
+                if (startDay > endDay) continue;
+
+                let pnl = 0;
+                let days = 0;
+                for (let day = startDay; day <= endDay; day++) {
+                    const key = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    const info = analytics.dailyMap[key];
+                    if (info && info.trades) {
+                        pnl += info.pnl;
+                        days += 1;
+                    }
+                }
+
+                const rangeLabel = `${new Intl.DateTimeFormat('en-US', { month: 'short' }).format(new Date(year, month, startDay))} ${startDay} - ${new Intl.DateTimeFormat('en-US', { month: 'short' }).format(new Date(year, month, endDay))} ${endDay}`;
+                weeklyTarget.insertAdjacentHTML('beforeend', `
+                    <div class="calendar-week">
+                        <div class="calendar-week-title">
+                            <span>Week ${weekIndex + 1}</span>
+                            <span class="text-slate-400">${rangeLabel}</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-4">
+                            <strong class="${pnl >= 0 ? 'text-emerald-400' : 'text-rose-300'}">${days ? `PnL: ${formatCurrency(pnl)}` : 'No trades'}</strong>
+                            <span class="text-slate-400">${days ? `Days: ${days}` : ''}</span>
+                        </div>
+                    </div>
+                `);
+            }
+        }
+
+        function renderResetCheckpointList() {
+            const target = document.getElementById('resetCheckpointList');
+            target.innerHTML = '';
+            if (!state.balanceResets.length) {
+                target.innerHTML = '<p class="text-slate-400">No reset checkpoints yet.</p>';
+                return;
+            }
+
+            state.balanceResets.slice().reverse().forEach(reset => {
+                target.insertAdjacentHTML('beforeend', `
+                    <div class="metric-block">
+                        <div class="flex items-center justify-between gap-4">
+                            <strong>${formatDisplayDate(reset.date)} ${reset.time}</strong>
+                            <span class="text-amber-300 font-extrabold">${formatCurrency(reset.balance)}</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-2">${reset.note || 'Balance checkpoint saved.'}</p>
+                    </div>
+                `);
+            });
+        }
+
+        function shiftDailySummaryMonth(delta) {
+            if (!dailySummaryMonthCursor) return;
+            const next = new Date(dailySummaryMonthCursor.year, dailySummaryMonthCursor.month + delta, 1);
+            dailySummaryMonthCursor = { year: next.getFullYear(), month: next.getMonth() };
+            updateUI();
+        }
+
+        function jumpDailySummaryToToday() {
+            const ny = getNewYorkNow();
+            dailySummaryMonthCursor = { year: ny.year, month: ny.month };
+            updateUI();
+        }
+
+        function formatIsoDate(date) {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        function formatDisplayDate(isoDate) {
+            if (!isoDate) return 'Select date';
+            const [year, month, day] = isoDate.split('-').map(Number);
+            return new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(new Date(year, month - 1, day));
+        }
+
+        function openDatePicker(context) {
+            datePickerState.context = context;
+            const currentValue = context === 'trade'
+                ? document.getElementById('mDateValue').value
+                : document.getElementById('resetDateValue').value;
+            const fallback = getNewYorkNow().date;
+            const source = currentValue || fallback;
+            const [year, month] = source.split('-').map(Number);
+            datePickerState.selectedDate = currentValue || '';
+            datePickerState.viewYear = year;
+            datePickerState.viewMonth = month - 1;
+            renderDatePicker();
+            document.getElementById('datePickerModal').classList.remove('hidden');
+        }
+
+        function closeDatePicker() {
+            document.getElementById('datePickerModal').classList.add('hidden');
+        }
+
+        function shiftPickerMonth(delta) {
+            const next = new Date(datePickerState.viewYear, datePickerState.viewMonth + delta, 1);
+            datePickerState.viewYear = next.getFullYear();
+            datePickerState.viewMonth = next.getMonth();
+            renderDatePicker();
+        }
+
+        function setPickerToday() {
+            const ny = getNewYorkNow();
+            datePickerState.selectedDate = ny.date;
+            datePickerState.viewYear = ny.year;
+            datePickerState.viewMonth = ny.month;
+            applyPickerDate(ny.date);
+        }
+
+        function clearPickerDate() {
+            applyPickerDate('');
+        }
+
+        function selectPickerDate(dateValue) {
+            datePickerState.selectedDate = dateValue;
+            applyPickerDate(dateValue);
+        }
+
+        function applyPickerDate(dateValue) {
+            if (datePickerState.context === 'trade') {
+                document.getElementById('mDateValue').value = dateValue;
+                document.getElementById('mDateDisplay').innerText = formatDisplayDate(dateValue);
+            } else {
+                document.getElementById('resetDateValue').value = dateValue;
+                document.getElementById('resetDateDisplay').innerText = formatDisplayDate(dateValue);
+            }
+            closeDatePicker();
+        }
+
+        function renderDatePicker() {
+            const target = document.getElementById('pickerGrid');
+            const label = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(new Date(datePickerState.viewYear, datePickerState.viewMonth, 1));
+            document.getElementById('pickerMonthLabel').innerText = label;
+
+            const firstDay = new Date(datePickerState.viewYear, datePickerState.viewMonth, 1);
+            const startIndex = firstDay.getDay();
+            const daysInMonth = new Date(datePickerState.viewYear, datePickerState.viewMonth + 1, 0).getDate();
+            const prevMonthDays = new Date(datePickerState.viewYear, datePickerState.viewMonth, 0).getDate();
+            const todayKey = getNewYorkNow().date;
+
+            const cells = [];
+            for (let i = 0; i < 42; i++) {
+                let dayNumber;
+                let date;
+                let muted = false;
+
+                if (i < startIndex) {
+                    dayNumber = prevMonthDays - startIndex + i + 1;
+                    date = new Date(datePickerState.viewYear, datePickerState.viewMonth - 1, dayNumber);
+                    muted = true;
+                } else if (i >= startIndex + daysInMonth) {
+                    dayNumber = i - startIndex - daysInMonth + 1;
+                    date = new Date(datePickerState.viewYear, datePickerState.viewMonth + 1, dayNumber);
+                    muted = true;
+                } else {
+                    dayNumber = i - startIndex + 1;
+                    date = new Date(datePickerState.viewYear, datePickerState.viewMonth, dayNumber);
+                }
+
+                const key = formatIsoDate(date);
+                const classes = ['picker-day'];
+                if (muted) classes.push('muted');
+                if (key === datePickerState.selectedDate) classes.push('selected');
+                if (key === todayKey) classes.push('today');
+                cells.push(`<button type="button" class="${classes.join(' ')}" onclick="selectPickerDate('${key}')">${dayNumber}</button>`);
+            }
+
+            target.innerHTML = cells.join('');
+        }
+
+        function renderMistakeSelector() {
+            const target = document.getElementById('mistakeSelector');
+            target.innerHTML = MISTAKE_OPTIONS.map(option => `
+                <div class="mistake-chip" data-mistake-chip data-value="${escapeQuotes(option)}" onclick="toggleMistakeOption('${option.replace(/'/g, "\\'")}')">
+                    <input type="checkbox" value="${option}" tabindex="-1" aria-hidden="true">
+                    <span>${option}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderChecklistSelector() {
+            const target = document.getElementById('checklistSelector');
+            target.innerHTML = state.checklistLibrary.map(option => `
+                <div class="mistake-chip" data-checklist-chip data-value="${escapeQuotes(option)}" onclick="toggleChecklistOption('${option.replace(/'/g, "\\'")}')">
+                    <input type="checkbox" value="${option}" tabindex="-1" aria-hidden="true">
+                    <span>${option}</span>
+                </div>
+            `).join('');
+        }
+
+        function exportJournal(type) {
+            const analytics = latestAnalytics || buildAnalytics();
+            const exportBestChecklistCombo = getBestPerformanceMetric(analytics.checklistComboData, 2).trades
+                ? getBestPerformanceMetric(analytics.checklistComboData, 2)
+                : getBestPerformanceMetric(analytics.checklistComboData);
+            if (type === 'json') {
+                const payload = {
+                    exportedAt: new Date().toISOString(),
+                    startBalance: START_BALANCE,
+                    summary: {
+                        totalTrades: analytics.tradeRows.length,
+                        endingBalance: Number(analytics.balance.toFixed(2)),
+                        currentSegmentGainPct: Number(analytics.currentNetGainPct.toFixed(2)),
+                        expectancyR: Number((analytics.tradeRows.length ? analytics.totalR / analytics.tradeRows.length : 0).toFixed(2)),
+                        maxDrawdownPct: Number(Math.abs(analytics.maxDrawdownPct).toFixed(2)),
+                        longestLosingTradeStreak: analytics.maxLosingStreak,
+                        longestLosingMonthStreak: analytics.monthStreaks.longest,
+                        resets: state.balanceResets.length,
+                        bestExecutionTime: getBestPerformanceMetric(analytics.executionTimeData).label,
+                        bestChecklistItem: getBestPerformanceMetric(analytics.checklistItemData).label,
+                        bestChecklistCombo: exportBestChecklistCombo.label
+                    },
+                    monthly: analytics.monthlyRows.map(month => ({
+                        month: month.month,
+                        trades: month.trades,
+                        totalR: Number(month.totalR.toFixed(2)),
+                        gainPct: Number(month.gainPct.toFixed(2))
+                    })),
+                    trades: analytics.tradeRows.map(trade => ({
+                        id: trade.id,
+                        date: trade.date,
+                        executionTime: trade.executionTime,
+                        session: trade.session,
+                        pair: trade.pair,
+                        type: trade.type,
+                        bias: trade.bias,
+                        setup: trade.setup,
+                        entryModel: trade.entryModel,
+                        timeframe: trade.timeframe,
+                        checklist: trade.checklist,
+                        grade: trade.grade,
+                        riskPct: Number(trade.riskPct.toFixed(2)),
+                        result: trade.result,
+                        r: Number(trade.r.toFixed(2)),
+                        gainPct: Number(trade.gainPct.toFixed(2)),
+                        pnl: Number(trade.pnl.toFixed(2)),
+                        mistakes: trade.mistakes,
+                        explainTrade: trade.explainTrade,
+                        explainMistakes: trade.explainMistakes
+                    }))
+                };
+
+                downloadFile(`forex-journal-export-${stampDate()}.json`, JSON.stringify(payload, null, 2), 'application/json');
+                return;
+            }
+
+            const header = [
+                'Date', 'Execution Time (NY)', 'Session', 'Pair', 'Type', 'Bias', 'Setup', 'Entry Model', 'Timeframe',
+                'Checklist', 'Grade', 'Risk %', 'Result', 'R Multiple', 'Gain %', 'PnL', 'Balance Before', 'Balance After',
+                'Plan', 'Mistakes', 'Explain the Trade / Why Did You Enter', 'Explain Mistakes', 'Screenshots Logged'
+            ];
+
+            const rows = analytics.tradeRows.map(trade => [
+                trade.date,
+                trade.executionTime,
+                trade.session,
+                trade.pair,
+                trade.type,
+                trade.bias,
+                trade.setup,
+                trade.entryModel,
+                trade.timeframe,
+                trade.checklist.join(' | '),
+                trade.grade,
+                trade.riskPct.toFixed(2),
+                trade.result,
+                trade.r.toFixed(2),
+                trade.gainPct.toFixed(2),
+                trade.pnl.toFixed(2),
+                trade.balanceBefore.toFixed(2),
+                trade.balanceAfter.toFixed(2),
+                trade.plan,
+                trade.mistakes.join(' | '),
+                trade.explainTrade,
+                trade.explainMistakes,
+                countScreenshots(trade.screenshots)
+            ]);
+
+            const summaryRows = [
+                [],
+                ['Summary'],
+                ['Ending Balance', analytics.balance.toFixed(2)],
+                ['Current Segment Gain %', analytics.currentNetGainPct.toFixed(2)],
+                ['Expectancy R', (analytics.tradeRows.length ? analytics.totalR / analytics.tradeRows.length : 0).toFixed(2)],
+                ['Max Drawdown %', Math.abs(analytics.maxDrawdownPct).toFixed(2)],
+                ['Longest Losing Trade Streak', analytics.maxLosingStreak],
+                ['Longest Losing Month Streak', analytics.monthStreaks.longest]
+            ];
+
+            const csv = [...[header], ...rows, ...summaryRows].map(csvRow).join('\n');
+            downloadFile(`forex-journal-export-${stampDate()}.csv`, csv, 'text/csv;charset=utf-8;');
+        }
+
+        function csvRow(cells) {
+            return cells.map(value => `"${String(value ?? '').replace(/"/g, '""')}"`).join(',');
+        }
+
+        function downloadFile(filename, content, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        function sortEntries(objectMap) {
+            const entries = Object.entries(objectMap);
+            return entries.length ? entries.sort((a, b) => b[1] - a[1]) : [['No Data', 0]];
+        }
+
+        function getBestCategory(objectMap) {
+            const entries = Object.entries(objectMap);
+            if (!entries.length) return { label: 'None', value: 0 };
+            const [label, value] = entries.sort((a, b) => b[1] - a[1])[0];
+            return { label, value };
+        }
+
+        function getTopMistake(mistakes) {
+            const entries = Object.entries(mistakes);
+            if (!entries.length) return 'None logged';
+            return entries.sort((a, b) => b[1] - a[1])[0][0];
+        }
+
+        function buildPalette(count, palette) {
+            return Array.from({ length: count }, (_, index) => palette[index % palette.length]);
+        }
+
+        function buildMonthWarning(streaks) {
+            if (!streaks.longest) return 'No warning';
+            if (streaks.current >= 2) return 'Trade smaller now';
+            if (streaks.longest >= 3) return 'Reduce frequency after repeat weak months';
+            return 'Watch monthly momentum';
+        }
+
+        function buildCoachingNote(snapshot) {
+            if (!snapshot.tradeCount) {
+                return 'Add a few trades and this journal will show where your execution is leaking money.';
+            }
+            if (snapshot.drawdown > 8) {
+                return 'Your drawdown is stretching. Cut risk, trade less, and protect the account until the curve stabilizes.';
+            }
+            if (snapshot.losingMonthStreak >= 2) {
+                return 'You have back-to-back losing months. This is the moment to trade less and only take your strongest setups.';
+            }
+            if (snapshot.planRate < 80) {
+                return 'Your plan-following rate is below 80%. Tighten selection and skip trades that do not match your rules.';
+            }
+            if (snapshot.expectancy <= 0) {
+                return 'You are active, but the average trade is not paying you yet. Review the checklist combinations and execution windows producing the best average return, then build around them.';
+            }
+            if (snapshot.topMistake !== 'None logged') {
+                return `Your biggest drag is "${snapshot.topMistake}". Solve that one mistake first and your journal should improve faster.`;
+            }
+            if (snapshot.avgChecklist < 2) {
+                return 'Your average trade is carrying too little confluence. Wait for cleaner checklist alignment before entering.';
+            }
+            return 'The numbers look disciplined. Keep sizing stable and lean harder into the pairs and sessions already paying you.';
+        }
+
+        function recreateChart(key, canvasId, config) {
+            if (chartRefs[key]) chartRefs[key].destroy();
+            chartRefs[key] = new Chart(document.getElementById(canvasId), config);
+        }
+
+        function lineChartOptions() {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: 'rgba(148, 163, 184, 0.08)' } },
+                    y: { grid: { color: 'rgba(148, 163, 184, 0.08)' } }
+                }
+            };
+        }
+
+        function barChartOptions(label) {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: context => `${label}: ${context.raw}%`
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { grid: { color: 'rgba(148, 163, 184, 0.08)' } }
+                }
+            };
+        }
+
+        function donutChartOptions() {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 18 }
+                    }
+                }
+            };
+        }
+
+        function polarChartOptions() {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        grid: { color: 'rgba(148, 163, 184, 0.14)' },
+                        angleLines: { color: 'rgba(148, 163, 184, 0.14)' }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 18 }
+                    }
+                }
+            };
+        }
+
+        async function initApp() {
+            renderMistakeSelector();
+            resetPreviews();
+            state = await loadStateFromVault();
+            renderChecklistSelector();
+            initializeTradeForm();
+            initializeResetForm();
+            const ny = getNewYorkNow();
+            dailySummaryMonthCursor = { year: ny.year, month: ny.month };
+            isReady = true;
+            updateUI();
+            await persistState('initialized');
+        }
+
+        window.addEventListener('load', initApp);
+    </script>
+</body>
+</html>
